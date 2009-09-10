@@ -1,0 +1,14 @@
+#
+# charmed Jamroot
+#
+
+path-constant BOOST_ROOT : ../../boost ;
+
+use-project boost : $(BOOST_ROOT) ;
+
+project charmed
+    : requirements
+        <include>./include
+    : usage-requirements
+        <include>./include
+    ;
