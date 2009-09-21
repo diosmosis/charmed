@@ -4,7 +4,6 @@
 #include <boost/multi_index/intrusive/detail/set_index.hpp>
 #include <boost/multi_index/intrusive/detail/key_from_value_composite.hpp>
 #include <boost/multi_index/intrusive/index_fwd.hpp>
-
 #include <boost/multi_index/detail/ord_index_args.hpp>
 
 #include <boost/intrusive/set.hpp>
@@ -44,7 +43,6 @@ namespace boost { namespace multi_index { namespace intrusive
             return impl().rbegin();
         }
 
-        // TODO, KeyCompare should not be created every time
         template <typename CompatibleKey>
         iterator find(CompatibleKey const& x)
         {

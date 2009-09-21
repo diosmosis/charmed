@@ -28,7 +28,6 @@ namespace charmed
             : D(d), type_data_hook(x)
         {}
 
-        // TODO need type-safety related stuff
         void const* type_data_hook;
     };
 

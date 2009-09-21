@@ -2,9 +2,7 @@
 #define BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_MAKE_POINTER_TUPLE_HPP
 
 #include <boost/mpl/transform.hpp>
-
 #include <boost/fusion/include/as_vector.hpp>
-
 #include <boost/type_traits/add_pointer.hpp>
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail

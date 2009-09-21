@@ -10,11 +10,13 @@
 #if !defined( CHARMED_INDEX_SPECIFIER_OF_HPP )
 #define CHARMED_INDEX_SPECIFIER_OF_HPP
 
+#include <charmed/charmed_fwd.hpp>
+
 #include <boost/multi_index/indexed_by.hpp>
 #include <boost/multi_index/intrusive/sequenced_index.hpp>
 #include <boost/multi_index/intrusive/ordered_index.hpp>
 
-#include <charmed/charmed_fwd.hpp>
+#include <boost/mpl/push_back.hpp>
 
 namespace charmed
 {

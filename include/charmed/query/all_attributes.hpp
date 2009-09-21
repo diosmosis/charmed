@@ -15,7 +15,6 @@
 
 namespace charmed { namespace query
 {
-    // TODO need to modify iterator so it does not give access to metadata<D> instance
     template <typename M>
     inline typename metadata_range<M>::type all_attributes()
     {

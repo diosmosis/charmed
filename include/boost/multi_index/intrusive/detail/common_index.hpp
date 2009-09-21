@@ -6,8 +6,6 @@
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
     // indices forward decls
-    // TODO must put multi index constraint checking
-    // TODO I don't know what the point of a modify(..., Rollback r) function is...
     template <typename MultiIndex, typename Impl, typename Specifier>
     struct common_index
     {

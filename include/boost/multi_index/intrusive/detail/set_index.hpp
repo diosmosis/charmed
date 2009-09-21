@@ -4,8 +4,6 @@
 #include <boost/multi_index/intrusive/detail/common_index.hpp>
 #include <boost/multi_index/intrusive/detail/key_from_value_composite.hpp>
 
-#include <iterator>
-
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
     // TODO need rollback modify_key?

@@ -1,8 +1,5 @@
 #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_MULTI_INDEX_CONTAINER_HPP )
 #define BOOST_MULTI_INDEX_INTRUSIVE_MULTI_INDEX_CONTAINER_HPP
-#include <boost/mpl/assert.hpp>
-template <typename T> struct lazy_false : boost::mpl::false_ {};
-
 
 #include <boost/multi_index/intrusive/detail/lazy_construct_from_tuple.hpp>
 #include <boost/multi_index/intrusive/detail/lazy_construct_index.hpp>

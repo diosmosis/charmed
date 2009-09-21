@@ -1,7 +1,7 @@
 #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_SWAP_INDEX_HPP )
 #define BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_SWAP_INDEX_HPP
 
-#include <boost\config.hpp>
+#include <boost/config.hpp>
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {

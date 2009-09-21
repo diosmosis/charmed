@@ -32,7 +32,6 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
             result.second = true;
         }
 
-        // TODO this can be optimized further by putting an operator() for 
         template <typename N>
         typename enable_if<
             is_associative_container<typename mpl::at<IndexTuple, N>::type::impl_type>, void

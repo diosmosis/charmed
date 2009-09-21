@@ -13,7 +13,6 @@
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
     // TODO use preprocessor include iteration
-    // TODO give it to joel de guzman for fusion
     template <typename T>
     struct lazy_construct_from_tuple
     {

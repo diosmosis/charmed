@@ -10,13 +10,9 @@
 #include <boost/multi_index/intrusive/detail/insert.hpp>
 #include <boost/multi_index/intrusive/detail/insert_with_hint.hpp>
 #include <boost/multi_index/intrusive/detail/make_pointer_tuple.hpp>
-
 #include <boost/fusion/include/for_each.hpp>
-
 #include <boost/mpl/range_c.hpp>
-
 #include <boost/assert.hpp>
-
 #include <utility>
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
@@ -48,7 +44,6 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         return ind.erase(f, l);
     }
 
-    // TODO optimize for case where x's key for certain indices is not changed.  no need to remove/re-insert for that one index.
     template <typename MultiIndex, typename Iterator>
     inline bool replace(MultiIndex const& mi, Iterator pos, typename MultiIndex::value_type const& x)
     {

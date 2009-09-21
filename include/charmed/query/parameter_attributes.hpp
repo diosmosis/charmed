@@ -40,7 +40,6 @@ namespace charmed { namespace query
         };
     }
 
-    // TODO need to modify iterator so it does not give access to metadata<D> instance
     template <typename M, typename F>
     inline boost::iterator_range<
         boost::filter_iterator<

@@ -2,7 +2,6 @@
 #define BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_CAN_INSERT_HPP
 
 #include <boost/multi_index/intrusive/detail/is_set_unique_container.hpp>
-
 #include <boost/utility/enable_if.hpp>
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail

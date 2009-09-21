@@ -4,7 +4,6 @@
 #include <boost/multi_index/intrusive/detail/vector_from_element.hpp>
 
 #include <boost/intrusive/detail/parent_from_member.hpp>
-
 #include <boost/intrusive/link_mode.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
