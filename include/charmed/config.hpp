@@ -7,21 +7,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#if !defined( CHARMED_CHARMED_FWD_HPP )
-#define CHARMED_CHARMED_FWD_HPP
+#if !defined( CHARMED_CONFIG_HPP )
+#define CHARMED_CONFIG_HPP
 
-#include <charmed/config.hpp>
+#define CHARMED_VERSION_MAJOR 0
+#define CHARMED_VERSION_MINOR 1
 
-namespace charmed
-{
-    template <typename D>
-    struct metadata_storage;
-
-    template <typename D>
-    struct immediate_metadata_base;
-
-    template <typename D>
-    struct metadata;
-}
-
-#endif // #if !defined( CHARMED_CHARMED_FWD_HPP )
+#endif // #if !defined( CHARMED_CONFIG_HPP )

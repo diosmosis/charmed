@@ -16,3 +16,5 @@ project charmed
     : usage-requirements
         <include>./include
     ;
+
+alias charmed ;
