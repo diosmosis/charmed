@@ -13,4 +13,8 @@
 #define CHARMED_VERSION_MAJOR 0
 #define CHARMED_VERSION_MINOR 1
 
+#if !defined( CHARMED_PARAMETER_LIMIT )
+#   define CHARMED_PARAMETER_LIMIT 10
+#endif
+
 #endif // #if !defined( CHARMED_CONFIG_HPP )

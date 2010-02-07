@@ -11,6 +11,7 @@
 #define CHARMED_DETAIL_METADATA_INITIALIZER_HPP
 
 #include <charmed/metadata_storage.hpp>
+#include <charmed/metadata.hpp>
 
 namespace charmed { namespace detail
 {

@@ -11,10 +11,12 @@
 #define CHARMED_INDEX_SPECIFIER_OF_HPP
 
 #include <charmed/charmed_fwd.hpp>
+#include <charmed/detail/immediate_metadata_base.hpp>
 
 #include <boost/multi_index/indexed_by.hpp>
 #include <boost/multi_index/intrusive/sequenced_index.hpp>
 #include <boost/multi_index/intrusive/ordered_index.hpp>
+#include <boost/multi_index/member.hpp>
 
 #include <boost/mpl/push_back.hpp>
 

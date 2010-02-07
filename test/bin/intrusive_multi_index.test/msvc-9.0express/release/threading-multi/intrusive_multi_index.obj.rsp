@@ -1,5 +1,0 @@
-"intrusive_multi_index.cpp" -Fo"bin\intrusive_multi_index.test\msvc-9.0express\release\threading-multi\intrusive_multi_index.obj"    -TP /O2 /Ob2 /W3 /GR /MD /Zc:forScope /Zc:wchar_t /wd4675 /EHs -c 
--DBOOST_TEST_NO_AUTO_LINK=1 
--DNDEBUG 
-"-I..\include" 
-"-Ic:\boost"

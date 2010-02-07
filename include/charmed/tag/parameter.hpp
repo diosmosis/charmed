@@ -7,14 +7,19 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#if !defined( BOOST_PP_IS_ITERATING )
+
 #if !defined( CHARMED_TAG_PARAMETER_HPP )
 #define CHARMED_TAG_PARAMETER_HPP
 
 #include <charmed/detail/metadata_initializer.hpp>
 
 #include <boost/preprocessor/cat.hpp>
-
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
+#include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/typeof/typeof.hpp>
+#include <boost/static_assert.hpp>
 
 #include <utility>
 
@@ -27,33 +32,31 @@
 
 namespace charmed
 {
-    // TODO make sure N is within the allowed range for the function's # of arguments (ie, can't tag a parameter of a function
-    // that doesn't have any)
-    // TODO use preprocessor iteration
     template <typename M, typename F, int N>
     struct parameter_association;
 
-    template <typename M, typename R, int N>
-    struct parameter_association<M, R(*)(), N>
-    {
-        template <R(*F)()>
-        struct type
-        {
-            static std::pair<void *, int> runtime_type_data;
-            static detail::metadata_initializer<M> metadata;
-        };
-    };
-
-    template <typename M, typename R, typename A0, int N>
-    struct parameter_association<M, R(*)(A0), N>
-    {
-        template <R(*F)(A0)>
-        struct type
-        {
-            static std::pair<void *, int> runtime_type_data;
-            static detail::metadata_initializer<M> metadata;
-        };
-    };
+#define BOOST_PP_FILENAME_1 <charmed/tag/parameter.hpp>
+#define BOOST_PP_ITERATION_LIMITS (0, CHARMED_PARAMETER_LIMIT)
+#include BOOST_PP_ITERATE()
 }
 
 #endif // #if !defined( CHARMED_TAG_PARAMETER_HPP )
+
+#else // #if !defined( BOOST_PP_IS_ITERATING )
+
+    #define J BOOST_PP_ITERATION()
+
+    template <typename M, typename R BOOST_PP_ENUM_TRAILING_PARAMS(J, typename A), int N>
+    struct parameter_association<M, R(*)(BOOST_PP_ENUM_PARAMS(J, A)), N>
+    {
+        BOOST_STATIC_ASSERT(N >= 0 && N < J);
+
+        template <typename R(*F)(BOOST_PP_ENUM_PARAMS(J, A))>
+        struct type
+        {
+            static std::pair<void *, int> runtime_type_data;
+            static detail::metadata_initializer<M> metadata;
+        };
+    };
+
+#endif // #if !defined( BOOST_PP_IS_ITERATING )

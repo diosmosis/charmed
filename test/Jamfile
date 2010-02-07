@@ -16,4 +16,5 @@ project charmed/test
 
 test-suite "charmed" :
     [ run intrusive_multi_index.cpp ]
+    [ run parameter.cpp ]
     ;

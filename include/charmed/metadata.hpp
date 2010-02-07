@@ -10,7 +10,9 @@
 #if !defined( CHARMED_METADATA_HPP )
 #define CHARMED_METADATA_HPP
 
+#include <charmed/charmed_fwd.hpp>
 #include <charmed/index_specifier_of.hpp>
+#include <charmed/detail/immediate_metadata_base.hpp>
 
 #include <boost/multi_index/intrusive/composite_hook.hpp>
 
@@ -21,16 +23,6 @@
 
 namespace charmed
 {
-    template <typename D>
-    struct immediate_metadata_base : D
-    {
-        immediate_metadata_base(void const* x, D const& d)
-            : D(d), type_data_hook(x)
-        {}
-
-        void const* type_data_hook;
-    };
-
     template <typename D>
     struct metadata : immediate_metadata_base<D>
     {
