@@ -1,9 +1,9 @@
 #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_ORDERED_INDEX_HPP )
 #define BOOST_MULTI_INDEX_INTRUSIVE_ORDERED_INDEX_HPP
 
+#include <boost/multi_index/intrusive/index_fwd.hpp>
 #include <boost/multi_index/intrusive/detail/set_index.hpp>
 #include <boost/multi_index/intrusive/detail/key_from_value_composite.hpp>
-#include <boost/multi_index/intrusive/index_fwd.hpp>
 #include <boost/multi_index/detail/ord_index_args.hpp>
 
 #include <boost/intrusive/set.hpp>

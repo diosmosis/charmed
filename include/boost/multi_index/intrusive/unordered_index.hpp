@@ -1,12 +1,21 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright (c) 2009 Benaka Moorthi
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+///////////////////////////////////////////////////////////////////////////////
+
 #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_UNORDERED_INDEX_HPP )
 #define BOOST_MULTI_INDEX_INTRUSIVE_UNORDERED_INDEX_HPP
 
-#include <boost/multi_index/intrusive/detail/set_index.hpp>
 #include <boost/multi_index/intrusive/index_fwd.hpp>
+#include <boost/multi_index/intrusive/detail/set_index.hpp>
+#include <boost/multi_index/intrusive/detail/key_from_value_composite.hpp>
+#include <boost/multi_index/intrusive/detail/hashed_index_args.hpp>
+#include <boost/multi_index/intrusive/detail/bucketed_unordered_set.hpp>
 
-#include <boost/multi_index/detail/hash_index_args.hpp>
-
-#include <boost/intrusive/unordered_set.hpp>
 #include <boost/intrusive/unordered_set_hook.hpp>
 
 namespace boost { namespace multi_index { namespace intrusive
@@ -85,25 +94,27 @@ namespace boost { namespace multi_index { namespace intrusive
         }
     };
 
-    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
     struct unordered_unique
     {
-        typedef typename multi_index::detail::hashed_index_args<Arg1, Arg2, Arg3, Arg4>     index_args;
+        typedef typename detail::hashed_index_args<Arg1, Arg2, Arg3, Arg4, Arg5>            index_args;
         typedef typename index_args::tag_list_type::type                                    tag_list_type;
         typedef typename index_args::key_from_value_type                                    key_from_value_type;
         typedef typename index_args::hash_type                                              hash_type;
         typedef typename index_args::pred_type                                              pred_type;
+        typedef typename index_args::bucket_count                                           bucket_count;
 
-        typedef intrusive::unordered_set_member_hook<>                                      hook_type;
+        typedef boost::intrusive::unordered_set_member_hook<>                               hook_type;
 
         template <typename Value, typename Hook, int N>
         struct impl_index
         {
-            typedef intrusive::unordered_set<
+            typedef detail::bucketed_unordered_set<
                 Value,
                 typename Hook::template apply<N>::type,
-                intrusive::hash<member_functor_adapter<key_from_value_type, hash_type> >,
-                intrusive::equal<member_functor_adapter<key_from_value_type, pred_type> >
+                boost::intrusive::hash<detail::key_from_value_composite<key_from_value_type, hash_type> >,
+                boost::intrusive::equal<detail::key_from_value_composite<key_from_value_type, pred_type> >,
+                bucket_count
             > type;
         };
 
@@ -119,25 +130,27 @@ namespace boost { namespace multi_index { namespace intrusive
         };
     };
 
-    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
     struct unordered_non_unique
     {
-        typedef typename multi_index::detail::hashed_index_args<Arg1, Arg2, Arg3, Arg4>     index_args;
+        typedef typename detail::hashed_index_args<Arg1, Arg2, Arg3, Arg4, Arg5>            index_args;
         typedef typename index_args::tag_list_type::type                                    tag_list_type;
         typedef typename index_args::key_from_value_type                                    key_from_value_type;
         typedef typename index_args::hash_type                                              hash_type;
         typedef typename index_args::pred_type                                              pred_type;
+        typedef typename index_args::bucket_count                                           bucket_count;
 
         typedef boost::intrusive::unordered_set_member_hook<>                               hook_type;
 
         template <typename Value, typename Hook, int N>
         struct impl_index
         {
-            typedef boost::intrusive::unordered_multiset<
+            typedef detail::bucketed_unordered_multiset<
                 Value,
                 typename Hook::template apply<N>::type,
-                boost::intrusive::hash<member_functor_adapter<key_from_value_type, hash_type> >,
-                boost::intrusive::equal<member_functor_adapter<key_from_value_type, pred_type> >
+                boost::intrusive::hash<detail::key_from_value_composite<key_from_value_type, hash_type> >,
+                boost::intrusive::equal<detail::key_from_value_composite<key_from_value_type, pred_type> >,
+                bucket_count
             > type;
         };
 
