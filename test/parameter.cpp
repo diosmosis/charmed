@@ -66,12 +66,15 @@ BOOST_AUTO_TEST_CASE( parameter_attributes )
     attribute_range attrs = query::parameter_attributes<parameter_name_attribute>(&my_function);
 
     iterator i = attrs.begin();
+    BOOST_REQUIRE(i != attrs.end());
     BOOST_CHECK(i->name == "arg1");
 
     ++i;
+    BOOST_REQUIRE(i != attrs.end());
     BOOST_CHECK(i->name == "arg2");
 
     ++i;
+    BOOST_REQUIRE(i != attrs.end());
     BOOST_CHECK(i->name == "whatever2");
 
     ++i;

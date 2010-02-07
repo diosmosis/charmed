@@ -15,10 +15,20 @@
 
 namespace charmed { namespace query
 {
-    template <typename M>
-    inline typename metadata_range<M>::type all_attributes()
+    namespace result_of
     {
-        typedef typename metadata_range<M>::type result_type;
+        template <typename M>
+        struct all_attributes
+        {
+            typedef typename metadata_range<M>::type type;
+        };
+    }
+
+    // TODO: there should be a way to specify the index to use when getting all attributes
+    template <typename M>
+    inline typename result_of::all_attributes<M>::type all_attributes()
+    {
+        typedef typename result_of::all_attributes<M>::type result_type;
         return result_type(metadata_storage<M>::metadata());
     }
 }}

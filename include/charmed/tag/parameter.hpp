@@ -35,23 +35,23 @@ namespace charmed
     template <typename M, typename F, int N>
     struct parameter_association;
 
+#define CHARMED_n BOOST_PP_ITERATION()
 #define BOOST_PP_FILENAME_1 <charmed/tag/parameter.hpp>
 #define BOOST_PP_ITERATION_LIMITS (0, CHARMED_PARAMETER_LIMIT)
 #include BOOST_PP_ITERATE()
+#undef CHARMED_n
 }
 
 #endif // #if !defined( CHARMED_TAG_PARAMETER_HPP )
 
 #else // #if !defined( BOOST_PP_IS_ITERATING )
 
-    #define J BOOST_PP_ITERATION()
-
-    template <typename M, typename R BOOST_PP_ENUM_TRAILING_PARAMS(J, typename A), int N>
-    struct parameter_association<M, R(*)(BOOST_PP_ENUM_PARAMS(J, A)), N>
+    template <typename M, typename R BOOST_PP_ENUM_TRAILING_PARAMS(CHARMED_n, typename A), int N>
+    struct parameter_association<M, R(*)(BOOST_PP_ENUM_PARAMS(CHARMED_n, A)), N>
     {
-        BOOST_STATIC_ASSERT(N >= 0 && N < J);
+        BOOST_STATIC_ASSERT(N >= 0 && N < CHARMED_n);
 
-        template <typename R(*F)(BOOST_PP_ENUM_PARAMS(J, A))>
+        template <R(*F)(BOOST_PP_ENUM_PARAMS(CHARMED_n, A))>
         struct type
         {
             static std::pair<void *, int> runtime_type_data;

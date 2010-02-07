@@ -32,6 +32,7 @@ namespace charmed
     struct real_index_specifier_of
         : boost::mpl::push_back<
             typename index_specifier_of<T>::type,
+            // TODO: should this be unordered or ordered?
             boost::multi_index::intrusive::ordered_unique<
                 boost::multi_index::member<
                     immediate_metadata_base<T>, void const*, &immediate_metadata_base<T>::type_data_hook
