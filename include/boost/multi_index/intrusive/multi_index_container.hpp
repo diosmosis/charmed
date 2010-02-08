@@ -16,6 +16,7 @@
 
 #include <boost/mpl/size.hpp>
 #include <boost/mpl/front.hpp>
+#include <boost/mpl/always.hpp>
 #include <boost/mpl/transform.hpp>
 #include <boost/mpl/range_c.hpp>
 #include <boost/mpl/identity.hpp>
@@ -58,18 +59,12 @@ namespace boost { namespace multi_index { namespace intrusive
             >
         {};
 
-        // TODO find a way to get rid of this extra metafunction
-        template <typename Ignore>
-        struct make_empty_vector
-            : mpl::identity<fusion::vector<> >
-        {};
-
         template <typename IndexSpecifierList>
         struct empty_args_type
             : fusion::result_of::as_vector<
                 typename mpl::transform<
                     IndexSpecifierList,
-                    make_empty_vector<mpl::_1>
+                    mpl::always<fusion::vector<> >
                 >::type
             >
         {};
