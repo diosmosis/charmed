@@ -7,6 +7,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#if !defined( BOOST_PP_IS_ITERATING )
+
 #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_LAZY_CONSTRUCT_FROM_TUPLE_HPP )
 #define BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_LAZY_CONSTRUCT_FROM_TUPLE_HPP
 
@@ -16,12 +18,15 @@
 #include <boost/mpl/size.hpp>
 
 #include <boost/fusion/include/at.hpp>
+#include <boost/fusion/container/vector/limits.hpp>
+
+#include <boost/preprocessor/repetition/enum.hpp>
+#include <boost/preprocessor/iteration/iterate.hpp>
 
 #include <boost/aligned_storage.hpp>
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
-    // TODO use preprocessor include iteration
     template <typename T>
     struct lazy_construct_from_tuple
     {
@@ -37,35 +42,15 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
             construct_impl(x, typename mpl::size<Tuple>::type());
         }
 
-        template <typename Tuple>
-        void construct_impl(Tuple const& x, mpl::int_<0>)
-        {
-            new (data.address()) T();
-        }
+#define BOOST_n BOOST_PP_ITERATION()
+#define BOOST_fusion_at(z, n, text) fusion::at_c<n>(x)
 
-        template <typename Tuple>
-        void construct_impl(Tuple const& x, mpl::int_<1>)
-        {
-            new (data.address()) T(fusion::at_c<0>(x));
-        }
+#define BOOST_PP_FILENAME_1 <boost/multi_index/intrusive/detail/lazy_construct_from_tuple.hpp>
+#define BOOST_PP_ITERATION_LIMITS (0, FUSION_MAX_VECTOR_SIZE)
+#include BOOST_PP_ITERATE()
 
-        template <typename Tuple>
-        void construct_impl(Tuple const& x, mpl::int_<2>)
-        {
-            new (data.address()) T(fusion::at_c<0>(x), fusion::at_c<1>(x));
-        }
-
-        template <typename Tuple>
-        void construct_impl(Tuple const& x, mpl::int_<3>)
-        {
-            new (data.address()) T(fusion::at_c<0>(x), fusion::at_c<1>(x), fusion::at_c<2>(x));
-        }
-
-        template <typename Tuple>
-        void construct_impl(Tuple const& x, mpl::int_<4>)
-        {
-            new (data.address()) T(fusion::at_c<0>(x), fusion::at_c<1>(x), fusion::at_c<2>(x), fusion::at_c<3>(x));
-        }
+#undef BOOST_n
+#undef BOOST_fusion_at
 
         operator T & () { return get(); }
         operator T const& () const { return get(); }
@@ -78,3 +63,13 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 }}}}
 
 #endif // #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_LAZY_CONSTRUCT_FROM_TUPLE_HPP )
+
+#else // #if !defined( BOOST_PP_IS_ITERATING )
+
+    template <typename Tuple>
+    void construct_impl(Tuple const& x, mpl::int_<BOOST_n>)
+    {
+        new (data.address()) T(BOOST_PP_ENUM(BOOST_n, BOOST_fusion_at, _));
+    }
+
+#endif // #if !defined( BOOST_PP_IS_ITERATING )
