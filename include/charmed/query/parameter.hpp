@@ -31,10 +31,11 @@ namespace charmed { namespace query
             {}
 
             template <typename T>
-            bool operator()(T & x) const
+            bool operator()(T const& x) const
             {
                 typedef std::pair<void *, int> pair_type;
-                return static_cast<pair_type const*>(x.type_data_hook)->first == f;
+                return static_cast<pair_type const*>(
+                    static_cast<metadata<T> const&>(x).type_data_hook)->first == f;
             }
 
             void * f;
@@ -79,13 +80,13 @@ namespace charmed { namespace query
     inline M const* parameter_attribute(F * f, int n)
     {
         typedef typename metadata_storage<M>::container_type container_type;
-        typedef typename metadata_iterator<M>::type metadata_iterator;
+        typedef typename container_type::const_iterator iterator;
         typedef std::pair<void *, int> pair_type;
 
         M const* result = 0;
 
         container_type const& metadata = metadata_storage<M>::metadata();
-        for (metadata_iterator i = metadata.begin(); i != metadata.end(); ++i)
+        for (iterator i = metadata.begin(); i != metadata.end(); ++i)
         {
             pair_type const* pair = static_cast<pair_type const*>(i->type_data_hook);
 
