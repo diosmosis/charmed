@@ -12,6 +12,7 @@
 
 #include <boost/multi_index/intrusive/detail/make_pointer_tuple.hpp>
 #include <boost/multi_index/intrusive/detail/is_associative_container.hpp>
+#include <boost/multi_index/intrusive/detail/insert_associative_impl.hpp>
 
 #include <boost/mpl/at.hpp>
 
@@ -52,7 +53,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
             if (result.second && static_cast<void *>(&ind.impl()) != static_cast<void *>(&other.impl()))
             {
-                std::pair<other_iterator, bool> result_ = other.impl().insert(value);
+                std::pair<other_iterator, bool> result_ = insert_associative_impl(other.impl(), value);
                 result = result_type(ind.impl().iterator_to(*result_.first), result_.second);
 
                 if (result.second)

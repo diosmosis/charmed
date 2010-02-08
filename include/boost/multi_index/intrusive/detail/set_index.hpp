@@ -55,7 +55,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
             return detail::insert_associative(container, *this, position, x);
         }
 
-        size_type erase(key_type const& x)
+        size_type erase(value_type const& x)
         {
             // get all items w/ the key 'x'
             std::pair<iterator, iterator> rng = impl().equal_range(x);

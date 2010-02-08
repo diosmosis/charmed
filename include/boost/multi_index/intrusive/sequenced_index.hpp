@@ -74,6 +74,26 @@ namespace boost { namespace multi_index { namespace intrusive
         {
             return detail::insert_sequenced(container, *this, position, x);
         }
+
+        reference front()
+        {
+            return impl().front();
+        }
+
+        const_reference front() const
+        {
+            return impl().front();
+        }
+
+        reference back()
+        {
+            return impl().back();
+        }
+
+        const_reference back() const
+        {
+            return impl().back();
+        }
     };
 
     template <typename TagList>

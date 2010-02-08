@@ -43,7 +43,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         template <typename Value>
         result_type operator()(Value & x) const
         {
-            return function(key_from_value_composite(x));
+            return function(key_from_value(x));
         }
 
         KeyFromValue key_from_value;

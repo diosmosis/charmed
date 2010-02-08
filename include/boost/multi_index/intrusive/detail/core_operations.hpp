@@ -19,11 +19,14 @@
 #include <boost/multi_index/intrusive/detail/insert.hpp>
 #include <boost/multi_index/intrusive/detail/insert_with_hint.hpp>
 #include <boost/multi_index/intrusive/detail/make_pointer_tuple.hpp>
+#include <boost/multi_index/intrusive/detail/insert_associative_impl.hpp>
+#include <boost/multi_index/intrusive/detail/clear_index.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/mpl/range_c.hpp>
 #include <boost/assert.hpp>
 #include <utility>
 
+// TODO: There seems to be a bit of code repetition here. Should get rid of it.
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
     template <typename MultiIndex, typename Index>
@@ -50,7 +53,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         fusion::for_each(mi.indices, erase_multiple<Index>(ind, f, l));
 
         // remove the range from ind and return the result
-        return ind.erase(f, l);
+        return ind.impl().erase(f, l);
     }
 
     template <typename MultiIndex, typename Iterator>
@@ -127,6 +130,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         return true;
     }
 
+    // TODO: exception safety (for all of intrusive multi_index). Oy.
     template <typename MultiIndex, typename Index>
     inline std::pair<typename Index::iterator, bool> insert_associative(
         MultiIndex & mi, Index & ind, typename Index::value_type & x)
@@ -136,7 +140,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         typedef typename make_pointer_tuple<index_type_list>::type index_ptr_tuple_type;
 
         // insert into ind
-        std::pair<typename Index::iterator, bool> result = ind.impl().insert(x);
+        std::pair<typename Index::iterator, bool> result = insert_associative_impl(ind.impl(), x);
 
         // if insertion fails, stop here
         if (!result.second)
@@ -154,7 +158,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         if (!result.second)
         {
             fusion::for_each(index_ptr_tuple, handle_failed_insert<value_type>(x));
-            ind.erase(ind.impl().iterator_to(x));
+            ind.impl().erase(ind.impl().iterator_to(x));
         }
 
         // return the result
@@ -221,6 +225,12 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
         // return the result
         return result;
+    }
+
+    template <typename MultiIndex>
+    inline void clear(MultiIndex & mi)
+    {
+        fusion::for_each(mi.indices, clear_index());
     }
 }}}}
 

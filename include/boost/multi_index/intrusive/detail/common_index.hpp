@@ -78,7 +78,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
         void clear()
         {
-            container.clear();
+            detail::clear(container);
         }
 
         void swap(common_index & x)

@@ -10,9 +10,9 @@
 #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_IS_ASSOCIATIVE_CONTAINER_HPP )
 #define BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_IS_ASSOCIATIVE_CONTAINER_HPP
 
-#include <boost/mpl/bool.hpp>
-
+#include <boost/multi_index/intrusive/detail/bucketed_fwd.hpp>
 #include <boost/intrusive/intrusive_fwd.hpp>
+#include <boost/mpl/bool.hpp>
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
@@ -62,6 +62,16 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         : mpl::true_
     {};
 #endif
+
+    template <typename V, typename Hk, typename Hs, typename E, typename B>
+    struct is_associative_container<bucketed_unordered_set<V, Hk, Hs, E, B> >
+        : mpl::true_
+    {};
+
+    template <typename V, typename Hk, typename Hs, typename E, typename B>
+    struct is_associative_container<bucketed_unordered_multiset<V, Hk, Hs, E, B> >
+        : mpl::true_
+    {};
 }}}}
 
 #endif // #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_IS_ASSOCIATIVE_CONTAINER_HPP )
