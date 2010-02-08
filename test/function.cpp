@@ -12,6 +12,7 @@
 #include <charmed/tag/function.hpp>
 #include <charmed/query/all_attributes.hpp>
 #include <charmed/query/metadata_of.hpp>
+#include <charmed/query/tagged_type_of.hpp>
 #include <string>
 
 using namespace charmed;
@@ -54,14 +55,17 @@ BOOST_AUTO_TEST_CASE( all_attributes_test )
     iterator i = all.begin();
     BOOST_REQUIRE(i != all.end());
     BOOST_CHECK(i->name == "my_function");
+    BOOST_CHECK(query::tagged_type_of<void (int, char **)>(*i) == &my_function);
 
     ++i;
     BOOST_REQUIRE(i != all.end());
     BOOST_CHECK(i->name == "my_other_function");
+    BOOST_CHECK(query::tagged_type_of<int ()>(*i) == &my_other_function);
 
     ++i;
     BOOST_REQUIRE(i != all.end());
     BOOST_CHECK(i->name == "my_last_function");
+    BOOST_CHECK(query::tagged_type_of<float (std::string)>(*i) == &my_last_function);
 
     ++i;
     BOOST_CHECK(i == all.end());

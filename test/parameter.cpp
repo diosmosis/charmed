@@ -11,6 +11,8 @@
 #include <boost/test/included/unit_test.hpp>
 #include <charmed/tag/parameter.hpp>
 #include <charmed/query/parameter.hpp>
+#include <charmed/query/all_attributes.hpp>
+#include <charmed/query/tagged_type_of.hpp>
 #include <string>
 
 using namespace charmed;
@@ -42,7 +44,7 @@ BOOST_AUTO_TEST_CASE( parameter_attribute_ct )
     BOOST_CHECK(query::parameter_attribute<parameter_name_attribute, 2>(&my_function) == "whatever");
 }
 */
-BOOST_AUTO_TEST_CASE( parameter_attribute_rt )
+BOOST_AUTO_TEST_CASE( parameter_attribute_rt_test )
 {
     parameter_name_attribute * attr = 0;
 
@@ -58,7 +60,7 @@ BOOST_AUTO_TEST_CASE( parameter_attribute_rt )
     BOOST_CHECK(query::parameter_attribute<parameter_name_attribute>(&my_function, 3)->name == "whatever2");
 }
 
-BOOST_AUTO_TEST_CASE( parameter_attributes )
+BOOST_AUTO_TEST_CASE( parameter_attributes_test )
 {
     typedef query::result_of::parameter_attributes<parameter_name_attribute>::type attribute_range;
     typedef attribute_range::iterator iterator;
@@ -76,6 +78,35 @@ BOOST_AUTO_TEST_CASE( parameter_attributes )
     ++i;
     BOOST_REQUIRE(i != attrs.end());
     BOOST_CHECK(i->name == "whatever2");
+
+    ++i;
+    BOOST_CHECK(i == attrs.end());
+}
+
+// TODO: There needs to be a way to refer to a parameter of a function using a void *. So it would be possible to say
+// metadata_of(function_parameter(&my_function, 1)) or tagged_type_of(attr) == function_parameter(&my_function, 1).
+// won't need parameter_attribute.
+BOOST_AUTO_TEST_CASE( all_attributes_test )
+{
+    typedef query::result_of::all_attributes<parameter_name_attribute>::type attribute_range;
+    typedef attribute_range::iterator iterator;
+
+    attribute_range attrs = query::all_attributes<parameter_name_attribute>();
+
+    iterator i = attrs.begin();
+    BOOST_REQUIRE(i != attrs.end());
+    BOOST_CHECK(i->name == "arg1");
+    BOOST_CHECK(query::tagged_type_of<void const>(*i) != 0);
+
+    ++i;
+    BOOST_REQUIRE(i != attrs.end());
+    BOOST_CHECK(i->name == "arg2");
+    BOOST_CHECK(query::tagged_type_of<void const>(*i) != 0);
+
+    ++i;
+    BOOST_REQUIRE(i != attrs.end());
+    BOOST_CHECK(i->name == "whatever2");
+    BOOST_CHECK(query::tagged_type_of<void const>(*i) != 0);
 
     ++i;
     BOOST_CHECK(i == attrs.end());

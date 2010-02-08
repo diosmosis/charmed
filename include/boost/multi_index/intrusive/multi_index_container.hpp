@@ -35,7 +35,6 @@
 #endif
 
 // TODO list all mechanisms non-intrusive multi-index uses to accomplish task, and see if there are better ways to do it
-// TODO get rid of range_c use if possible
 // TODO need to check for unordered_index and store bucket array and use it in construction of multi index
 namespace boost { namespace multi_index { namespace intrusive
 {
