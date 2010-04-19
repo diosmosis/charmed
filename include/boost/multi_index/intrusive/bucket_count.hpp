@@ -7,8 +7,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#if !defined( BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_BUCKET_COUNT_HPP )
-#define BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_BUCKET_COUNT_HPP
+#if !defined( BOOST_MULTI_INDEX_INTRUSIVE_BUCKET_COUNT_HPP )
+#define BOOST_MULTI_INDEX_INTRUSIVE_BUCKET_COUNT_HPP
 
 #include <boost/mpl/int.hpp>
 
@@ -20,4 +20,4 @@ namespace boost { namespace multi_index
     {};
 }}
 
-#endif // #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_BUCKET_COUNT_HPP )
+#endif // #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_BUCKET_COUNT_HPP )

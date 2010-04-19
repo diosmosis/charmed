@@ -7,8 +7,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#if !defined( BOOST_MULTI_INDEX_INTRUSIVE_CLEAR_INDEX_HPP )
-#define BOOST_MULTI_INDEX_INTRUSIVE_CLEAR_INDEX_HPP
+#if !defined( BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_CLEAR_INDEX_HPP )
+#define BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_CLEAR_INDEX_HPP
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
@@ -22,4 +22,4 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
     };
 }}}}
 
-#endif // #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_CLEAR_INDEX_HPP )
+#endif // #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_CLEAR_INDEX_HPP )

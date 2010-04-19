@@ -16,7 +16,6 @@
 
 namespace boost { namespace multi_index { namespace intrusive
 {
-    // TODO: Rename to fusion_hook.
     template <typename IndexSpecifierList>
     struct composite_hook
         : fusion::result_of::as_vector<
