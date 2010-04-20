@@ -47,11 +47,12 @@ struct value_type_impl
 };
 
 // TODO: composite_hook was written specifically for charmed. it should be possible to use the intrusive multi_index
-// without composite_hook.
+// without composite_hook. In other words, it should be possible to divvy up the hooks and specify each one in
+// the multi_index_container template, instead of having the value_type_impl class above.
 struct value_type : value_type_impl
 {
     typedef indexed_by<
-        intrusive::sequenced<>,
+        intrusive::sequenced,
         intrusive::ordered_unique<member<value_type_impl, int, &value_type_impl::ordered_unique_key> >,
         intrusive::ordered_non_unique<member<value_type_impl, int, &value_type_impl::ordered_non_unique_key> >,
         intrusive::unordered_unique<member<value_type_impl, int, &value_type_impl::unordered_unique_key> >,

@@ -29,8 +29,8 @@ namespace charmed
         typedef boost::multi_index::intrusive::composite_hook<typename real_index_specifier_of<D>::type> hook_type;
 
         template <typename T>
-        metadata(T const& x, D const& d)
-            : immediate_metadata_base(x, d)
+        metadata(T const* x, D const& d)
+            : immediate_metadata_base(x, typeid(T), d)
         {}
 
         hook_type hook;

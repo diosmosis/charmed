@@ -13,6 +13,7 @@
 #include <boost/multi_index/intrusive/detail/vector_from_element.hpp>
 
 #include <boost/intrusive/detail/parent_from_member.hpp>
+#include <boost/intrusive/detail/utilities.hpp>
 #include <boost/intrusive/link_mode.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
@@ -47,14 +48,15 @@ namespace boost { namespace multi_index { namespace intrusive
 
         static pointer to_value_ptr(node_ptr n)
         {
-            hook_type * hook = static_cast<hook_type *>(boost::intrusive::detail::get_pointer(n));
+            hook_type * hook = static_cast<hook_type *>(boost::intrusive::detail::boost_intrusive_get_pointer(n));
             HookTuple * hook_tuple = detail::vector_from_element<HookTuple, N>(hook);
             return boost::intrusive::detail::parent_from_member<T, HookTuple>(hook_tuple, P);
         }
 
         static const_pointer to_value_ptr(const_node_ptr n)
         {
-            hook_type const* hook = static_cast<hook_type const*>(boost::intrusive::detail::get_pointer(n));
+            hook_type const* hook = static_cast<hook_type const*>(
+                boost::intrusive::detail::boost_intrusive_get_pointer(n));
             HookTuple const* hook_tuple = detail::vector_from_element<HookTuple, N>(hook);
             return boost::intrusive::detail::parent_from_member<T, HookTuple>(hook_tuple, P);
         }

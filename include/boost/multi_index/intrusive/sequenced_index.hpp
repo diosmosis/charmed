@@ -96,11 +96,8 @@ namespace boost { namespace multi_index { namespace intrusive
         }
     };
 
-    template <typename TagList>
     struct sequenced
     {
-        BOOST_STATIC_ASSERT(multi_index::detail::is_tag<TagList>::value);
-
         typedef boost::intrusive::list_member_hook<> hook_type;
 
         template <typename Value, typename Hook, int N>
@@ -112,7 +109,7 @@ namespace boost { namespace multi_index { namespace intrusive
         template <typename MultiIndex, typename Value, typename Hook, int N>
         struct index_class
         {
-            typedef sequenced_index<MultiIndex, typename impl_index<Value, Hook, N>::type, sequenced<TagList> > type;
+            typedef sequenced_index<MultiIndex, typename impl_index<Value, Hook, N>::type, sequenced> type;
         };
     };
 }}}

@@ -35,7 +35,7 @@ namespace charmed { namespace query
             {
                 typedef std::pair<void *, int> pair_type;
                 return static_cast<pair_type const*>(
-                    static_cast<metadata<T> const&>(x).type_data_hook)->first == f;
+                    static_cast<metadata<T> const&>(x).tagged_data)->first == f;
             }
 
             void * f;
@@ -88,7 +88,7 @@ namespace charmed { namespace query
         container_type const& metadata = metadata_storage<M>::metadata();
         for (iterator i = metadata.begin(); i != metadata.end(); ++i)
         {
-            pair_type const* pair = static_cast<pair_type const*>(i->type_data_hook);
+            pair_type const* pair = static_cast<pair_type const*>(i->tagged_data);
 
             if (pair->first == f && pair->second == n)
             {

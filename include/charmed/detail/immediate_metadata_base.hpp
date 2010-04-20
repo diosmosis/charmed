@@ -17,11 +17,14 @@ namespace charmed
     template <typename D>
     struct immediate_metadata_base : D
     {
-        immediate_metadata_base(void const* x, D const& d)
-            : D(d), type_data_hook(x)
+        immediate_metadata_base(void const* x, std::type_info const& tagged_type_, D const& d)
+            : D(d)
+            , tagged_data(x)
+            , tagged_type(tagged_type_)
         {}
 
-        void const* type_data_hook;
+        void const* tagged_data;
+        std::type_info const& tagged_type;
     };
 }
 

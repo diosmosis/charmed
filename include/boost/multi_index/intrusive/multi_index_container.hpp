@@ -125,6 +125,7 @@ namespace boost { namespace multi_index { namespace intrusive
             : base_type(*this, fusion::front(index_storage))
             , indices(index_range(), detail::create_index_wrapper<self_type>(*this))
         {
+            // TODO: This will fail...
             lazy_construct(args_list);
         }
 

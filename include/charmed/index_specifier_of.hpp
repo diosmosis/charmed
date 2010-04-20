@@ -25,7 +25,7 @@ namespace charmed
     template <typename T>
     struct index_specifier_of
     {
-        typedef boost::multi_index::indexed_by<boost::multi_index::intrusive::sequenced<> > type;
+        typedef boost::multi_index::indexed_by<boost::multi_index::intrusive::sequenced> type;
     };
 
     template <typename T>
@@ -35,7 +35,7 @@ namespace charmed
             // TODO: should this be unordered or ordered?
             boost::multi_index::intrusive::ordered_unique<
                 boost::multi_index::member<
-                    immediate_metadata_base<T>, void const*, &immediate_metadata_base<T>::type_data_hook
+                    immediate_metadata_base<T>, void const*, &immediate_metadata_base<T>::tagged_data
                 >
             >
         >

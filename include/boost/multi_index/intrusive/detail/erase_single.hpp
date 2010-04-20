@@ -31,7 +31,13 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
             // just erase the element
             if (static_cast<void *>(&x.impl()) == static_cast<void *>(&index.impl()))
             {
-                result = index.impl().iterator_to(*x.impl().erase(x.impl().iterator_to(value)));
+                // have to get the element after value this way since boost::intrusive::unordered_set's erase does not
+                // return anything
+                // TODO: I should NOT need unconst() here...
+                result = index.impl().iterator_to(value).unconst();
+                ++result;
+
+                x.impl().erase(x.impl().iterator_to(value));
             }
             else
             {

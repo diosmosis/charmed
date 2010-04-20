@@ -96,17 +96,17 @@ BOOST_AUTO_TEST_CASE( all_attributes_test )
     iterator i = attrs.begin();
     BOOST_REQUIRE(i != attrs.end());
     BOOST_CHECK(i->name == "arg1");
-    BOOST_CHECK(query::tagged_type_of<void const>(*i) != 0);
+    BOOST_CHECK(query::tagged_type_of_raw(*i) != 0);
 
     ++i;
     BOOST_REQUIRE(i != attrs.end());
     BOOST_CHECK(i->name == "arg2");
-    BOOST_CHECK(query::tagged_type_of<void const>(*i) != 0);
+    BOOST_CHECK(query::tagged_type_of_raw(*i) != 0);
 
     ++i;
     BOOST_REQUIRE(i != attrs.end());
     BOOST_CHECK(i->name == "whatever2");
-    BOOST_CHECK(query::tagged_type_of<void const>(*i) != 0);
+    BOOST_CHECK(query::tagged_type_of_raw(*i) != 0);
 
     ++i;
     BOOST_CHECK(i == attrs.end());

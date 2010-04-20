@@ -114,15 +114,14 @@ namespace boost { namespace multi_index { namespace intrusive
         }
     };
 
-    template <typename Arg1, typename Arg2, typename Arg3>
+    template <typename Arg1, typename Arg2>
     struct ordered_unique
     {
-        typedef multi_index::detail::ordered_index_args<Arg1, Arg2, Arg3>   index_args;
-        typedef typename index_args::tag_list_type::type                    tag_list_type;
-        typedef typename index_args::key_from_value_type                    key_from_value_type;
-        typedef typename index_args::compare_type                           compare_type;
+        typedef multi_index::detail::ordered_index_args<Arg1, Arg2, mpl::na>    index_args;
+        typedef typename index_args::key_from_value_type                        key_from_value_type;
+        typedef typename index_args::compare_type                               compare_type;
 
-        typedef boost::intrusive::set_member_hook<>                         hook_type;
+        typedef boost::intrusive::set_member_hook<>                             hook_type;
 
         template <typename Value, typename Hook, int N>
         struct impl_index
@@ -142,20 +141,20 @@ namespace boost { namespace multi_index { namespace intrusive
                 key_from_value_type,
                 compare_type,
                 typename impl_index<Value, Hook, N>::type,
-                ordered_unique<Arg1, Arg2, Arg3>
+                ordered_unique<Arg1, Arg2>
             > type;
         };
     };
 
-    template <typename Arg1, typename Arg2, typename Arg3>
+    template <typename Arg1, typename Arg2>
     struct ordered_non_unique
     {
-        typedef multi_index::detail::ordered_index_args<Arg1, Arg2, Arg3>   index_args;
-        typedef typename index_args::tag_list_type::type                    tag_list_type;
-        typedef typename index_args::key_from_value_type                    key_from_value_type;
-        typedef typename index_args::compare_type                           compare_type;
+        typedef multi_index::detail::ordered_index_args<Arg1, Arg2, mpl::na>    index_args;
+        typedef typename index_args::tag_list_type::type                        tag_list_type;
+        typedef typename index_args::key_from_value_type                        key_from_value_type;
+        typedef typename index_args::compare_type                               compare_type;
 
-        typedef boost::intrusive::set_member_hook<>                         hook_type;
+        typedef boost::intrusive::set_member_hook<>                             hook_type;
 
         template <typename Value, typename Hook, int N>
         struct impl_index
@@ -175,7 +174,7 @@ namespace boost { namespace multi_index { namespace intrusive
                 key_from_value_type,
                 compare_type,
                 typename impl_index<Value, Hook, N>::type,
-                ordered_non_unique<Arg1, Arg2, Arg3>
+                ordered_non_unique<Arg1, Arg2>
             > type;
         };
     };

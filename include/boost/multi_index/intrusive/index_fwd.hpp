@@ -16,28 +16,23 @@
 namespace boost { namespace multi_index { namespace intrusive
 {
     // specifier forward decls
-    // Arg1 -> !TagList
-    // Arg2 -> KeyFromValue
-    // Arg3 -> Compare
-    template <typename Arg1, typename Arg2 = mpl::na, typename Arg3 = mpl::na>
+    // Arg1 -> KeyFromValue
+    // Arg2 -> Compare
+    template <typename Arg1, typename Arg2 = mpl::na>
     struct ordered_unique;
 
-    template <typename Arg1, typename Arg2 = mpl::na, typename Arg3 = mpl::na>
+    template <typename Arg1, typename Arg2 = mpl::na>
     struct ordered_non_unique;
 
-    // Arg1 -> !TagList
-    // Arg2 -> KeyFromValue
-    // Arg3 -> Hash
-    // Arg4 -> Pred
-    template <typename Arg1 = mpl::na, typename Arg2 = mpl::na, typename Arg3 = mpl::na, typename Arg4 = mpl::na,
-              typename Arg5 = mpl::na>
+    // Arg1 -> KeyFromValue
+    // Arg2 -> Hash
+    // Arg3 -> Pred
+    template <typename Arg1 = mpl::na, typename Arg2 = mpl::na, typename Arg3 = mpl::na, typename Arg4 = mpl::na>
     struct unordered_unique;
 
-    template <typename Arg1 = mpl::na, typename Arg2 = mpl::na, typename Arg3 = mpl::na, typename Arg4 = mpl::na,
-              typename Arg5 = mpl::na>
+    template <typename Arg1 = mpl::na, typename Arg2 = mpl::na, typename Arg3 = mpl::na, typename Arg4 = mpl::na>
     struct unordered_non_unique;
 
-    template <typename TagList = tag<> >
     struct sequenced;
 }}}
 

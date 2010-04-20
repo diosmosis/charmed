@@ -94,11 +94,10 @@ namespace boost { namespace multi_index { namespace intrusive
         }
     };
 
-    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
+    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
     struct unordered_unique
     {
-        typedef typename detail::hashed_index_args<Arg1, Arg2, Arg3, Arg4, Arg5>            index_args;
-        typedef typename index_args::tag_list_type::type                                    tag_list_type;
+        typedef typename detail::hashed_index_args<Arg1, Arg2, Arg3, Arg4>                  index_args;
         typedef typename index_args::key_from_value_type                                    key_from_value_type;
         typedef typename index_args::hash_type                                              hash_type;
         typedef typename index_args::pred_type                                              pred_type;
@@ -130,11 +129,10 @@ namespace boost { namespace multi_index { namespace intrusive
         };
     };
 
-    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
+    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
     struct unordered_non_unique
     {
-        typedef typename detail::hashed_index_args<Arg1, Arg2, Arg3, Arg4, Arg5>            index_args;
-        typedef typename index_args::tag_list_type::type                                    tag_list_type;
+        typedef typename detail::hashed_index_args<Arg1, Arg2, Arg3, Arg4>                  index_args;
         typedef typename index_args::key_from_value_type                                    key_from_value_type;
         typedef typename index_args::hash_type                                              hash_type;
         typedef typename index_args::pred_type                                              pred_type;
