@@ -18,10 +18,10 @@
 #include <boost/multi_index/intrusive/detail/handle_failed_insert.hpp>
 #include <boost/multi_index/intrusive/detail/insert.hpp>
 #include <boost/multi_index/intrusive/detail/insert_with_hint.hpp>
-#include <boost/multi_index/intrusive/detail/make_pointer_tuple.hpp>
 #include <boost/multi_index/intrusive/detail/insert_associative_impl.hpp>
 #include <boost/multi_index/intrusive/detail/clear_index.hpp>
 #include <boost/fusion/include/for_each.hpp>
+#include <boost/fusion/include/vector.hpp>
 #include <boost/mpl/range_c.hpp>
 #include <boost/assert.hpp>
 #include <utility>
@@ -60,8 +60,6 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
     inline bool replace(MultiIndex const& mi, Iterator pos, typename MultiIndex::value_type const& x)
     {
         typedef typename MultiIndex::value_type value_type;
-        typedef typename MultiIndex::index_view_type index_type_list;
-        typedef typename make_pointer_tuple<index_type_list>::type index_ptr_tuple_type;
 
         // for every associative index, check if x can be inserted, assuming *pos is absent
         bool result;
@@ -82,16 +80,12 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         // modify the value
         value = x;
 
-        // re-insert into associative indices (there's no binary foreach, so we must iterate over a mpl range and
-        // access elements using the given mpl int_.)
-        bool result;
-        index_ptr_tuple_type index_ptr_tuple;
-        fusion::for_each(
-            mpl::range_c<0, MultiIndex::index_count>(),
-            insert_assoc<value_type, index_type_list>(value, result, mi.indices, index_ptr_tuple));
+        // re-insert into associative indices
+        insert_assoc<value_type> ia(value);
+        fusion::for_each(mi.indices, ia);
 
         // since we checked beforehand, the insertion should always work
-        BOOST_ASSERT(result);
+        BOOST_ASSERT(ia.result);
 
         return true;
     }
@@ -100,8 +94,6 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
     inline bool modify(MultiIndex & mi, Iterator pos, Modifier & m)
     {
         typedef typename MultiIndex::value_type value_type;
-        typedef typename MultiIndex::index_view_type index_type_list;
-        typedef typename make_pointer_tuple<index_type_list>::type index_ptr_tuple_type;
 
         // get the value before detaching
         value_type & value = *pos;
@@ -113,16 +105,13 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         m(value);
 
         // attempt to re-insert value to every non-sequence index
-        bool result;
-        index_ptr_tuple_type index_ptr_tuple;
-        fusion::for_each(
-            mpl::range_c<0, MultiIndex::index_count>(),
-            insert_assoc<value_type, index_type_list>(value, result, mi.indices, index_ptr_tuple));
+        insert_assoc<value_type> ia(value);
+        fusion::for_each(mi.indices, ia);
 
         // if re-insertion failed, remove the modified value from every index that successfully added it
-        if (!result)
+        if (!ia.result)
         {
-            fusion::for_each(index_ptr_tuple, handle_failed_insert<value_type>(value));
+            fusion::for_each(mi.indices, handle_failed_insert<value_type>(value, ia.last_failed));
             return false;
         }
 
@@ -136,8 +125,6 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         MultiIndex & mi, Index & ind, typename Index::value_type & x)
     {
         typedef typename MultiIndex::value_type value_type;
-        typedef typename MultiIndex::index_view_type index_type_list;
-        typedef typename make_pointer_tuple<index_type_list>::type index_ptr_tuple_type;
 
         // insert into ind
         std::pair<typename Index::iterator, bool> result = insert_associative_impl(ind.impl(), x);
@@ -149,15 +136,13 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         }
 
         // insert into all other indices
-        index_ptr_tuple_type index_ptr_tuple;
-        fusion::for_each(
-            mpl::range_c<int, 0, MultiIndex::index_count>(),
-            insert<Index, index_type_list>(x, ind, result, mi.indices, index_ptr_tuple));
+        insert<typename Index::impl_type> ins(x, ind, result);
+        fusion::for_each(mi.indices, ins);
 
         // if insertion failed, remove the value from every index
         if (!result.second)
         {
-            fusion::for_each(index_ptr_tuple, handle_failed_insert<value_type>(x));
+            fusion::for_each(mi.indices, handle_failed_insert<value_type>(x, ins.last_failed));
             ind.impl().erase(ind.impl().iterator_to(x));
         }
 
@@ -170,8 +155,6 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         MultiIndex & mi, Index & index, typename Index::iterator pos, typename Index::value_type & x)
     {
         typedef typename MultiIndex::value_type value_type;
-        typedef typename MultiIndex::index_view_type index_type_list;
-        typedef typename make_pointer_tuple<index_type_list>::type index_ptr_tuple_type;
 
         // insert into ind
         typename Index::iterator result = ind.impl().insert(pos, x);
@@ -183,15 +166,13 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         }
 
         // insert into all other indices
-        index_ptr_tuple_type index_ptr_tuple;
-        fusion::for_each(
-            mpl::range_c<int, 0, MultiIndex::index_count>(),
-            insert_with_hint<Index, index_type_list>(ind, x, pos, result, mi.indices, index_ptr_tuple));
+        insert_with_hint<typename Index::impl_type> iwh(ind, x, pos, result);
+        fusion::for_each(mi.indices, iwh);
 
         // if insertion failed, remove the value from every index
         if (&*result != &x)
         {
-            fusion::for_each(index_ptr_tuple, handle_failed_insert<value_type>(x));
+            fusion::for_each(mi.indices, handle_failed_insert<value_type>(x, iwh.last_failed));
             ind.impl().erase(ind.impl().iterator_to(x));
         }
 
@@ -204,22 +185,18 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         MultiIndex & mi, Index & ind, typename Index::iterator pos, typename Index::value_type & x)
     {
         typedef typename MultiIndex::value_type value_type;
-        typedef typename MultiIndex::index_view_type index_type_list;
-        typedef typename make_pointer_tuple<index_type_list>::type index_ptr_tuple_type;
 
         // insert into ind
         std::pair<typename Index::iterator, bool> result = std::make_pair(ind.impl().insert(pos, x), true);
 
         // insert into every other index
-        index_ptr_tuple_type index_ptr_tuple;
-        fusion::for_each(
-            mpl::range_c<int, 0, MultiIndex::index_count>(),
-            insert<Index, index_type_list>(x, ind, result, mi.indices, index_ptr_tuple));
+        insert<typename Index::impl_type> ins(x, ind, result);
+        fusion::for_each(mi.indices, ins);
 
         // if insertion failed, remove the value from every index
         if (!result.second)
         {
-            fusion::for_each(index_ptr_tuple, handle_failed_insert<value_type>(x));
+            fusion::for_each(mi.indices, handle_failed_insert<value_type>(x, ins.last_failed));
             ind.impl().erase(ind.impl().iterator_to(x));
         }
 

@@ -374,6 +374,8 @@ BOOST_AUTO_TEST_CASE( associative_insert_unique_failure )
         value_type value(0, 4, 4, 4);
 
         BOOST_CHECK(!c.get<2>().insert(value).second);
+
+        check_indices_dont_contain(c, value);
     }
 }
 
@@ -393,5 +395,53 @@ BOOST_AUTO_TEST_CASE( associative_insert_nonunique_accuracy )
 
         c.get<4>().insert(value2);
         check_indices_contain(c, value2);
+    }
+}
+
+BOOST_AUTO_TEST_CASE( modify_accuracy )
+{
+    std::list<value_type> all_values;
+    {
+        container c;
+
+        fill_container(c, all_values);
+
+        // TODO
+    }
+}
+
+BOOST_AUTO_TEST_CASE( modify_failure )
+{
+    std::list<value_type> all_values;
+    {
+        container c;
+
+        fill_container(c, all_values);
+
+        // TODO
+    }
+}
+
+BOOST_AUTO_TEST_CASE( replace_accuracy )
+{
+    std::list<value_type> all_values;
+    {
+        container c;
+
+        fill_container(c, all_values);
+
+        // TODO
+    }
+}
+
+BOOST_AUTO_TEST_CASE( replace_failure )
+{
+    std::list<value_type> all_values;
+    {
+        container c;
+
+        fill_container(c, all_values);
+
+        // TODO
     }
 }

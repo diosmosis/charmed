@@ -10,81 +10,63 @@
 #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_INSERT_HPP )
 #define BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_INSERT_HPP
 
-#include <boost/multi_index/intrusive/detail/make_pointer_tuple.hpp>
 #include <boost/multi_index/intrusive/detail/is_associative_container.hpp>
 #include <boost/multi_index/intrusive/detail/insert_associative_impl.hpp>
-
 #include <boost/mpl/at.hpp>
-
 #include <boost/fusion/include/at.hpp>
-
 #include <boost/utility/enable_if.hpp>
-
 #include <utility>
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
-    template <typename Index, typename IndexTuple>
+    template <typename IndexImpl>
     struct insert
     {
-        typedef typename Index::value_type value_type;
-        typedef typename make_pointer_tuple<IndexTuple>::type index_ptr_tuple;
-        typedef std::pair<typename Index::iterator, bool> result_type;
+        typedef typename IndexImpl::value_type value_type;
+        typedef typename IndexImpl::iterator iterator;
+        typedef std::pair<iterator, bool> pair_result;
 
-        insert(value_type & v, Index & i, result_type & r, IndexTuple & indtup, index_ptr_tuple & ins)
+        template <typename Index>
+        insert(value_type & v, Index & i, pair_result & r)
             : value(v)
-            , ind(i)
+            , ind(i.impl())
             , result(r)
-            , indices(indtup)
-            , inserted(ins)
+            , last_failed(-1)
         {
             result.second = true;
         }
 
-        template <typename N>
+        template <typename Index>
         typename enable_if<
-            is_associative_container<typename mpl::at<IndexTuple, N>::type::impl_type>, void
-        >::type operator()(N) const
+            is_associative_container<typename Index::impl_type>, void
+        >::type operator()(Index & other) const
         {
-            typedef typename mpl::at<IndexTuple, N>::type other_type;
-            typedef other_type::iterator other_iterator;
-
-            other_type & other = fusion::at<N>(indices);
-
-            if (result.second && static_cast<void *>(&ind.impl()) != static_cast<void *>(&other.impl()))
+            if (result.second && static_cast<void *>(&ind) != static_cast<void *>(&other.impl()))
             {
-                std::pair<other_iterator, bool> result_ = insert_associative_impl(other.impl(), value);
-                result = result_type(ind.impl().iterator_to(*result_.first), result_.second);
+                std::pair<typename Index::iterator, bool> r = insert_associative_impl(other.impl(), value);
+                result = std::make_pair(ind.iterator_to(*r.first), r.second);
 
-                if (result.second)
-                {
-                    fusion::at<N>(inserted) = &other;
-                }
+                ++last_failed;
             }
         }
 
-        template <typename N>
+        template <typename Index>
         typename disable_if<
-            is_associative_container<typename mpl::at<IndexTuple, N>::type::impl_type>, void
-        >::type operator()(N) const
+            is_associative_container<typename Index::impl_type>, void
+        >::type operator()(Index & other) const
         {
-            typedef typename mpl::at<IndexTuple, N>::type other_type;
-            typedef other_type::iterator other_iterator;
-
-            other_type & other = fusion::at<N>(indices);
-
-            if (result.second && static_cast<void *>(&ind.impl()) != static_cast<void *>(&other.impl()))
+            if (result.second && static_cast<void *>(&ind) != static_cast<void *>(&other.impl()))
             {
                 other.impl().push_back(value);
-                fusion::at<N>(inserted) = &other;
+
+                ++last_failed;
             }
         }
 
-        Index & ind;
+        IndexImpl & ind;
         value_type & value;
-        result_type & result;
-        IndexTuple & indices;
-        index_ptr_tuple & inserted;
+        pair_result & result;
+        mutable unsigned int last_failed;
     };
 }}}}
 

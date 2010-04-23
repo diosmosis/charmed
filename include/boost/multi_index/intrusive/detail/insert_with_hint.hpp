@@ -10,73 +10,54 @@
 #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_INSERT_WITH_HINT_HPP )
 #define BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_INSERT_WITH_HINT_HPP
 
-#include <boost/multi_index/intrusive/detail/make_pointer_tuple.hpp>
 #include <boost/multi_index/intrusive/detail/is_associative_container.hpp>
-
-#include <boost/mpl/at.hpp>
-
-#include <boost/fusion/include/at.hpp>
-
 #include <boost/utility/enable_if.hpp>
-
 #include <utility>
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
-    template <typename Index, typename IndexTuple>
+    template <typename IndexImpl>
     struct insert_with_hint
     {
-        typedef typename Index::value_type value_type;
-        typedef typename make_pointer_tuple<IndexTuple>::type index_ptr_tuple;
-        typedef typename Index::iterator iterator;
+        typedef typename IndexImpl::value_type value_type;
+        typedef typename IndexImpl::iterator iterator;
 
-        insert_with_hint(value_type & v, Index & i, iterator p, iterator & r, IndexTuple & indtup, index_ptr_tuple & ins)
+        template <typename Index>
+        insert_with_hint(value_type & v, Index & i, iterator p, iterator & r)
             : value(v)
-            , ind(i)
+            , ind(i.impl())
             , pos(p)
             , result(r)
-            , indices(indtup)
-            , inserted(ins)
-        {
-            result.second = true;
-        }
+        {}
 
-        template <typename N>
+        template <typename Index>
         typename enable_if<
-            is_associative_container<typename mpl::at<IndexTuple, N>::type::impl_type>, void
-        >::type operator()(N) const
+            is_associative_container<typename Index::impl_type>, void
+        >::type operator()(Index & other) const
         {
-            typedef typename mpl::at<IndexTuple, N>::type other_type;
-            typedef other_type::iterator other_iterator;
+            typedef typename Index::iterator other_iterator;
 
-            other_type & other = fusion::at<N>(indices);
-
-            if (!failed() && static_cast<void *>(&ind.impl()) != static_cast<void *>(&other.impl()))
+            if (!failed() && static_cast<void *>(&ind) != static_cast<void *>(&other.impl()))
             {
-                other_iterator result_ = fusion::at<N>(indices).impl().insert(pos, value);
+                other_iterator result_ = other.impl().insert(pos, value);
                 result = ind.impl().iterator_to(*result_);
 
-                if (!failed())
-                {
-                    fusion::at<N>(inserted) = &fusion::at<N>(indices);
-                }
+                ++last_failed;
             }
         }
 
-        template <typename N>
+        template <typename Index>
         typename disable_if<
-            is_associative_container<typename mpl::at<IndexTuple, N>::type::impl_type>, void
-        >::type operator()(N) const
+            is_associative_container<typename Index::impl_type>, void
+        >::type operator()(Index & other) const
         {
-            typedef typename mpl::at<IndexTuple, N>::type other_type;
-            typedef other_type::iterator other_iterator;
+            typedef typename Index::iterator other_iterator;
 
-            other_type & other = fusion::at<N>(indices);
-
-            if (!failed() && static_cast<void *>(&ind.impl()) != static_cast<void *>(&other.impl()))
+            if (!failed() && static_cast<void *>(&ind) != static_cast<void *>(&other.impl()))
             {
                 other.impl().push_back(value);
-                fusion::at<N>(inserted) = &other;
+
+                ++last_failed;
             }
         }
 
@@ -85,12 +66,10 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
             return &value != &*result;
         }
 
-        Index & ind;
+        IndexImpl & ind;
         value_type & value;
         iterator pos;
         iterator & result;
-        IndexTuple & indices;
-        index_ptr_tuple & inserted;
     };
 }}}}
 
