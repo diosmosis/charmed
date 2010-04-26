@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 /// \file insert_assoc.hpp
-/// Contains the insert_assoc\<\> function object.
+/// Contains the <c>insert_assoc\<\></c> function object.
 //
 //  Copyright (c) 2010 Benaka Moorthi
 //
@@ -23,20 +23,18 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
     ///        \ref core_operations.hpp to reinsert modified values into
     ///        the associative indices of a <c>multi_index_container</c>.
     /// 
-    /// <c>insert_assoc</c> accepts either a non-const reference to an index
-    /// and a reference to a pointer of that index type, or a fusion sequence
-    /// with those elements. Sequenced indices are ignored and insertion will
-    /// only be attempted on indices if past insertions have succeeded. In case
-    /// of a failed insertion, the <c>result</c> member is set to false and the
-    /// <c>last_failed</c> member will be set to the index of the of index
-    /// whose insertion failed.
+    /// <c>insert_assoc\<\></c> accepts a non-const reference to an index. Sequenced
+    /// indices are ignored and insertion will only be attempted on indices if
+    /// past insertions have succeeded. In case of a failed insertion, the <c>result</c>
+    /// member is set to false and the <c>last_index</c> member will be set to the
+    /// index of the of index where insertion failed.
     template <typename Value>
     struct insert_assoc
     {
         insert_assoc(Value & v)
             : value(v)
             , result(true)
-            , last_failed(-1)
+            , last_index(-1)
         {}
 
         template <typename Index>
@@ -48,7 +46,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
             {
                 result = idx.impl().insert(value).second;
 
-                ++last_failed;
+                ++last_index;
             }
         }
 
@@ -61,8 +59,8 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         }
 
         Value & value;
-        bool & result;
-        mutable unsigned int last_failed; // TODO: This needs a better name.
+        bool result;
+        mutable unsigned int last_index;
     };
 }}}}
 

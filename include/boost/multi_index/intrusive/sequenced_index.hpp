@@ -18,16 +18,14 @@
 
 namespace boost { namespace multi_index { namespace intrusive
 {
-    template <typename MultiIndex, typename Impl, typename Specifier>
-    struct sequenced_index : detail::common_index<MultiIndex, Impl, Specifier>
+    template <typename MultiIndexTypes, int N>
+    struct sequenced_index : detail::common_index<MultiIndexTypes, N>
     {
-        typedef detail::common_index<MultiIndex, Impl, Specifier> base_type;
-
         typedef typename impl_type::reverse_iterator            reverse_iterator;
         typedef typename impl_type::const_reverse_iterator      const_reverse_iterator;
 
-        sequenced_index(multi_index_type & x, Impl & i)
-            : base_type(x, i)
+        sequenced_index(multi_index_type & x, impl_type & i)
+            : common_index(x, i)
         {}
 
         reverse_iterator rbegin()
@@ -106,10 +104,10 @@ namespace boost { namespace multi_index { namespace intrusive
             typedef boost::intrusive::list<Value, typename Hook::template apply<N>::type> type;
         };
 
-        template <typename MultiIndex, typename Value, typename Hook, int N>
+        template <typename MultiIndex, int N>
         struct index_class
         {
-            typedef sequenced_index<MultiIndex, typename impl_index<Value, Hook, N>::type, sequenced> type;
+            typedef sequenced_index<MultiIndex, N> type;
         };
     };
 }}}

@@ -37,7 +37,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         {
             typedef typename Index::iterator other_iterator;
 
-            if (!failed() && static_cast<void *>(&ind) != static_cast<void *>(&other.impl()))
+            if (!failed())
             {
                 other_iterator result_ = other.impl().insert(pos, value);
                 result = ind.impl().iterator_to(*result_);
@@ -53,7 +53,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         {
             typedef typename Index::iterator other_iterator;
 
-            if (!failed() && static_cast<void *>(&ind) != static_cast<void *>(&other.impl()))
+            if (!failed())
             {
                 other.impl().push_back(value);
 

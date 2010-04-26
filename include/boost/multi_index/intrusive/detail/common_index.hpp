@@ -11,29 +11,38 @@
 #define BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_COMMON_INDEX_HPP
 
 #include <boost/multi_index/intrusive/detail/core_operations.hpp>
+#include <boost/mpl/int.hpp>
+#include <boost/mpl/at.hpp>
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
     // indices forward decls
-    template <typename MultiIndex, typename Impl, typename Specifier>
+    template <typename MultiIndexTypes, int N>
     struct common_index
     {
-        typedef MultiIndex                                      multi_index_type;
-        typedef Impl                                            impl_type;
-        typedef Specifier                                       specifier;
+        typedef mpl::int_<N>                                        index_n;
 
-        typedef typename impl_type::value_type                  value_type;
-        typedef typename impl_type::iterator                    iterator;
-        typedef typename impl_type::const_iterator              const_iterator;
-        typedef typename impl_type::reference                   reference;
-        typedef typename impl_type::const_reference             const_reference;
-        typedef typename impl_type::pointer                     pointer;
-        typedef typename impl_type::const_pointer               const_pointer;
-        typedef typename impl_type::difference_type             difference_type;
-        typedef typename impl_type::size_type                   size_type;
+        typedef typename MultiIndexTypes::self_type                 multi_index_type;
 
-        common_index(multi_index_type & x, Impl & i)
-            : container(x), impl_(i)
+        typedef typename MultiIndexTypes::local_index_tuple_type    impl_list;
+        typedef typename MultiIndexTypes::index_specifier_list      specifier_list;
+
+        typedef typename mpl::at_c<impl_list, N>::type::data_type   impl_type;
+        typedef typename mpl::at_c<specifier_list, N>::type         specifier;
+
+        typedef typename impl_type::value_type                      value_type;
+        typedef typename impl_type::iterator                        iterator;
+        typedef typename impl_type::const_iterator                  const_iterator;
+        typedef typename impl_type::reference                       reference;
+        typedef typename impl_type::const_reference                 const_reference;
+        typedef typename impl_type::pointer                         pointer;
+        typedef typename impl_type::const_pointer                   const_pointer;
+        typedef typename impl_type::difference_type                 difference_type;
+        typedef typename impl_type::size_type                       size_type;
+
+        common_index(multi_index_type & x, impl_type & i)
+            : container(x)
+            , impl_(i)
         {}
 
         iterator begin()
@@ -107,12 +116,12 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
             return detail::modify(container, position, m);
         }
 
-        Impl & impl()
+        impl_type & impl()
         {
             return impl_;
         }
 
-        Impl const& impl() const
+        impl_type const& impl() const
         {
             return impl_;
         }
@@ -128,7 +137,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         }
 
         multi_index_type & container;
-        Impl & impl_;
+        impl_type & impl_;
     };
 }}}}
 

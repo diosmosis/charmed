@@ -10,12 +10,20 @@
 #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_COMPOSITE_HOOK_HPP )
 #define BOOST_MULTI_INDEX_INTRUSIVE_COMPOSITE_HOOK_HPP
 
-#include <boost/multi_index/intrusive/detail/hook_type_of.hpp>
 #include <boost/mpl/transform.hpp>
 #include <boost/fusion/include/as_vector.hpp>
 
 namespace boost { namespace multi_index { namespace intrusive
 {
+    namespace detail
+    {
+        template <typename IndexSpecifier>
+        struct hook_type_of
+        {
+            typedef typename IndexSpecifier::hook_type type;
+        };
+    }
+
     template <typename IndexSpecifierList>
     struct composite_hook
         : fusion::result_of::as_vector<

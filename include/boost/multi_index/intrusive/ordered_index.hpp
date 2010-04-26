@@ -20,16 +20,16 @@
 
 namespace boost { namespace multi_index { namespace intrusive
 {
-    template <typename MultiIndex, typename KeyFromValue, typename KeyCompare, typename Impl, typename Specifier>
-    struct ordered_index : detail::set_index<MultiIndex, KeyFromValue, Impl, Specifier>
+    template <typename MultiIndexTypes, int N>
+    struct ordered_index : detail::set_index<MultiIndexTypes, N>
     {
-        typedef detail::set_index<MultiIndex, KeyFromValue, Impl, Specifier> base_type;
-
         typedef typename impl_type::reverse_iterator            reverse_iterator;
         typedef typename impl_type::const_reverse_iterator      const_reverse_iterator;
 
-        ordered_index(multi_index_type & x, Impl & i)
-            : base_type(x, i)
+        typedef typename specifier::compare_type key_compare_type;
+
+        ordered_index(multi_index_type & x, impl_type & i)
+            : set_index(x, i)
         {}
 
         reverse_iterator rbegin()
@@ -55,62 +55,67 @@ namespace boost { namespace multi_index { namespace intrusive
         template <typename CompatibleKey>
         iterator find(CompatibleKey const& x)
         {
-            return impl().find(x, detail::key_from_value_composite<KeyFromValue, KeyCompare>());
+            return impl().find(x, detail::key_from_value_composite<key_from_value_type, key_compare_type>());
         }
 
         template <typename CompatibleKey>
         const_iterator find(CompatibleKey const& x) const
         {
-            return impl().find(x, detail::key_from_value_composite<KeyFromValue, KeyCompare>());
+            return impl().find(x, detail::key_from_value_composite<key_from_value_type, key_compare_type>());
         }
 
         template <typename CompatibleKey, typename CompatibleCompare>
         iterator find(CompatibleKey const& x, CompatibleCompare const& comp) const
         {
-            return impl().find(x, detail::key_from_value_composite<KeyFromValue, CompatibleCompare>(comp));
+            return impl().find(x, detail::key_from_value_composite<key_from_value_type, CompatibleCompare>(comp));
         }
 
         template <typename CompatibleKey, typename CompatibleCompare>
         size_type count(CompatibleKey const& x, CompatibleCompare const& comp) const
         {
-            return impl().count(x, detail::key_from_value_composite<KeyFromValue, CompatibleCompare>(comp));
+            return impl().count(x, detail::key_from_value_composite<key_from_value_type, CompatibleCompare>(comp));
         }
 
         template <typename CompatibleKey>
         iterator lower_bound(CompatibleKey const& x) const
         {
-            return impl().lower_bound(x, detail::key_from_value_composite<KeyFromValue, KeyCompare>());
+            return impl().lower_bound(x, detail::key_from_value_composite<key_from_value_type, key_compare_type>());
         }
 
         template <typename CompatibleKey, typename CompatibleCompare>
         iterator lower_bound(CompatibleKey const& x, CompatibleCompare const& comp) const
         {
-            return impl().lower_bound(x, detail::key_from_value_composite<KeyFromValue, CompatibleCompare>(comp));
+            return impl().lower_bound(x, detail::key_from_value_composite<key_from_value_type, CompatibleCompare>(comp));
         }
 
         template <typename CompatibleKey>
         iterator upper_bound(CompatibleKey const& x)const
         {
-            return impl().upper_bound(x, detail::key_from_value_composite<KeyFromValue, KeyCompare>());
+            return impl().upper_bound(x, detail::key_from_value_composite<key_from_value_type, key_compare_type>());
         }
 
         template <typename CompatibleKey, typename CompatibleCompare>
         iterator upper_bound(CompatibleKey const& x, CompatibleCompare const& comp) const
         {
-            return impl().upper_bound(x, detail::key_from_value_composite<KeyFromValue, CompatibleCompare>(comp));
+            return impl().upper_bound(x, detail::key_from_value_composite<key_from_value_type, CompatibleCompare>(comp));
         }
 
         template <typename CompatibleKey, typename CompatibleCompare>
         std::pair<const_iterator, const_iterator> equal_range(
             CompatibleKey const& x, CompatibleCompare const& comp) const
         {
-            return impl().equal_range(x, detail::key_from_value_composite<KeyFromValue, CompatibleCompare>(comp));
+            return impl().equal_range(x, detail::key_from_value_composite<key_from_value_type, CompatibleCompare>(comp));
         }
 
         template <typename LowerBounder, typename UpperBounder>
         std::pair<const_iterator, const_iterator> range(LowerBounder const& lower, UpperBounder const& upper) const
         {
             return impl().range(lower, upper);
+        }
+
+        bool key_equal(value_type const& x, value_type const& y) const
+        {
+            return impl().key_eq()(x, y);
         }
     };
 
@@ -133,16 +138,10 @@ namespace boost { namespace multi_index { namespace intrusive
             > type;
         };
 
-        template <typename MultiIndex, typename Value, typename Hook, int N>
+        template <typename MultiIndex, int N>
         struct index_class
         {
-            typedef ordered_index<
-                MultiIndex,
-                key_from_value_type,
-                compare_type,
-                typename impl_index<Value, Hook, N>::type,
-                ordered_unique<Arg1, Arg2>
-            > type;
+            typedef ordered_index<MultiIndex, N> type;
         };
     };
 
@@ -166,16 +165,10 @@ namespace boost { namespace multi_index { namespace intrusive
             > type;
         };
 
-        template <typename MultiIndex, typename Value, typename Hook, int N>
+        template <typename MultiIndex, int N>
         struct index_class
         {
-            typedef ordered_index<
-                MultiIndex,
-                key_from_value_type,
-                compare_type,
-                typename impl_index<Value, Hook, N>::type,
-                ordered_non_unique<Arg1, Arg2>
-            > type;
+            typedef ordered_index<MultiIndex, N> type;
         };
     };
 }}}

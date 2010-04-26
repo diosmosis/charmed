@@ -30,6 +30,8 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
     template <typename T>
     struct lazy_construct_from_tuple
     {
+        typedef T data_type;
+
         lazy_construct_from_tuple() : data() {}
         ~lazy_construct_from_tuple()
         {

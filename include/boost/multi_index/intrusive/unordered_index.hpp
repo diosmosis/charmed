@@ -20,16 +20,14 @@
 
 namespace boost { namespace multi_index { namespace intrusive
 {
-    template <typename MultiIndex, typename KeyFromValue, typename Impl, typename Specifier>
-    struct unordered_index : detail::set_index<MultiIndex, KeyFromValue, Impl, Specifier>
+    template <typename MultiIndexTypes, int N>
+    struct unordered_index : detail::set_index<MultiIndexTypes, N>
     {
-        typedef detail::set_index<MultiIndex, KeyFromValue, Impl, Specifier> base_type;
-
         typedef typename impl_type::local_iterator          local_iterator;
         typedef typename impl_type::const_local_iterator    const_local_iterator;
 
-        unordered_index(multi_index_type & x, Impl & i)
-            : base_type(x, i)
+        unordered_index(multi_index_type & x, impl_type & i)
+            : set_index(x, i)
         {}
 
         template <typename CompatibleKey>
@@ -117,15 +115,10 @@ namespace boost { namespace multi_index { namespace intrusive
             > type;
         };
 
-        template <typename MultiIndex, typename Value, typename Hook, int N>
+        template <typename MultiIndex, int N>
         struct index_class
         {
-            typedef unordered_index<
-                MultiIndex,
-                key_from_value_type,
-                typename impl_index<Value, Hook, N>::type,
-                unordered_unique<Arg1, Arg2, Arg3, Arg4>
-            > type;
+            typedef unordered_index<MultiIndex, N> type;
         };
     };
 
@@ -152,15 +145,10 @@ namespace boost { namespace multi_index { namespace intrusive
             > type;
         };
 
-        template <typename MultiIndex, typename Value, typename Hook, int N>
+        template <typename MultiIndex, int N>
         struct index_class
         {
-            typedef unordered_index<
-                MultiIndex,
-                key_from_value_type,
-                typename impl_index<Value, Hook, N>::type,
-                unordered_non_unique<Arg1, Arg2, Arg3, Arg4>
-            > type;
+            typedef unordered_index<MultiIndex, N> type;
         };
     };
 }}}

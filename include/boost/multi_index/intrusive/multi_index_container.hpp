@@ -10,6 +10,7 @@
 #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_MULTI_INDEX_CONTAINER_HPP )
 #define BOOST_MULTI_INDEX_INTRUSIVE_MULTI_INDEX_CONTAINER_HPP
 
+#include <boost/multi_index/intrusive/index_fwd.hpp>
 #include <boost/multi_index/intrusive/detail/lazy_construct_from_tuple.hpp>
 #include <boost/multi_index/intrusive/detail/lazy_construct_index.hpp>
 #include <boost/multi_index/intrusive/detail/create_index_wrapper.hpp>
@@ -70,40 +71,40 @@ namespace boost { namespace multi_index { namespace intrusive
     }
 
     template <typename Value, typename IndexSpecifierList, typename HookSpecifier>
-    struct multi_index_container
-        : boost::noncopyable,
-          boost::mpl::front<IndexSpecifierList>::type::template index_class<
-              multi_index_container<Value, IndexSpecifierList, HookSpecifier>, Value, HookSpecifier, 0
-          >::type
+    struct multi_index_container_types
     {
         enum { index_count = mpl::size<IndexSpecifierList>::value };
 
+        typedef multi_index_container_types<Value, IndexSpecifierList, HookSpecifier> mi_types;
+
         typedef multi_index_container<Value, IndexSpecifierList, HookSpecifier> self_type;
-
-        typedef typename detail::make_impl_index_vector<Value, IndexSpecifierList, HookSpecifier>::type local_index_tuple_type;
-        typedef mpl::range_c<int, 0, index_count> index_range;
-
-        typedef fusion::transform_view<index_range, detail::create_index_wrapper<self_type> > index_view_type;
-
-        typedef typename mpl::front<IndexSpecifierList>::type::template index_class<
-            self_type, Value, HookSpecifier, 0
-        >::type base_type;
-
-        typedef typename detail::empty_args_type<IndexSpecifierList>::type empty_args_type;
 
         typedef HookSpecifier hook_specifier;
         typedef IndexSpecifierList index_specifier_list;
+
+        typedef typename detail::make_impl_index_vector<Value, IndexSpecifierList, HookSpecifier>::type local_index_tuple_type;
+
+        typedef mpl::range_c<int, 0, index_count> index_range;
+
+        typedef typename detail::empty_args_type<IndexSpecifierList>::type empty_args_type;
+    };
+
+    template <typename Value, typename IndexSpecifierList, typename HookSpecifier>
+    struct multi_index_container
+        : boost::noncopyable
+        , multi_index_container_types<Value, IndexSpecifierList, HookSpecifier>
+        , boost::mpl::front<IndexSpecifierList>::type::template index_class<
+              multi_index_container_types<Value, IndexSpecifierList, HookSpecifier>, 0
+          >::type
+    {
+        typedef fusion::transform_view<index_range, detail::create_index_wrapper<self_type> > index_view_type;
+
+        typedef typename mpl::front<IndexSpecifierList>::type::template index_class<mi_types, 0>::type base_type;
 
         template <int N>
         struct nth_index
             : fusion::result_of::at_c<index_view_type, N>
         {};
-
-        // TODO need tag support
-        //template <typename Tag>
-        //struct index
-        //    : boost::mpl::at<local_index_tuple_type, Tag>
-        //{};
 
         multi_index_container()
             : base_type(*this, fusion::front(index_storage))
@@ -143,18 +144,6 @@ namespace boost { namespace multi_index { namespace intrusive
             return fusion::at_c<N>(indices);
         }
 
-        //template <typename Tag>
-        //typename index<Tag>::type & get()
-        //{
-        //    TODO
-        //}
-
-        //template <typename Tag>
-        //typename index<Tag>::type const& get() const
-        //{
-        //    TODO
-        //}
-
         template <int N, typename IteratorType>
         typename nth_index<N>::type::iterator project(IteratorType it)
         {
@@ -166,18 +155,6 @@ namespace boost { namespace multi_index { namespace intrusive
         {
             return get<N>().iterator_to(*it);
         }
-
-        //template <typename Tag, typename IteratorType>
-        //typename index<Tag>::type::iterator project(IteratorType it)
-        //{
-        //    TODO
-        //}
-
-        //template <typename Tag, typename IteratorType>
-        //typename index<Tag>::type::const_iterator project(IteratorType it) const
-        //{
-        //    TODO
-        //}
 
         void swap(self_type & y)
         {

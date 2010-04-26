@@ -445,3 +445,21 @@ BOOST_AUTO_TEST_CASE( replace_failure )
         // TODO
     }
 }
+
+BOOST_AUTO_TEST_CASE( erase_multiple_accuracy )
+{
+    std::list<value_type> all_values;
+    {
+        container c;
+
+        fill_container(c, all_values);
+
+        c.erase(++c.begin(), c.end());
+
+        std::list<value_type>::iterator i = all_values.begin();
+        check_indices_contain(c, *i);
+        check_indices_dont_contain(c, *++i);
+        check_indices_dont_contain(c, *++i);
+        check_indices_dont_contain(c, *++i);
+    }
+}

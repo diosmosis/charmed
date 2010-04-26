@@ -11,7 +11,6 @@
 #define BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_CORE_OPERATIONS_HPP
 
 #include <boost/multi_index/intrusive/detail/erase_single.hpp>
-#include <boost/multi_index/intrusive/detail/erase_multiple.hpp>
 #include <boost/multi_index/intrusive/detail/erase_assoc.hpp>
 #include <boost/multi_index/intrusive/detail/insert_assoc.hpp>
 #include <boost/multi_index/intrusive/detail/can_insert.hpp>
@@ -21,7 +20,9 @@
 #include <boost/multi_index/intrusive/detail/insert_associative_impl.hpp>
 #include <boost/multi_index/intrusive/detail/clear_index.hpp>
 #include <boost/fusion/include/for_each.hpp>
-#include <boost/fusion/include/vector.hpp>
+#include <boost/fusion/include/erase.hpp>
+#include <boost/fusion/include/begin.hpp>
+#include <boost/fusion/include/advance.hpp>
 #include <boost/mpl/range_c.hpp>
 #include <boost/assert.hpp>
 #include <utility>
@@ -30,13 +31,26 @@
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
     template <typename MultiIndex, typename Index>
+    inline typename fusion::result_of::erase<
+        typename MultiIndex::index_view_type,
+        typename fusion::result_of::advance<
+            typename fusion::result_of::begin<typename MultiIndex::index_view_type>::type,
+            typename Index::index_n
+        >::type
+    >::type all_indices_but(MultiIndex & mi, Index & ind)
+    {
+        return fusion::erase(mi.indices, fusion::advance<Index::index_n>(fusion::begin(mi.indices)));
+    }
+
+    template <typename MultiIndex, typename Index>
     inline typename Index::iterator erase(MultiIndex & mi, Index & ind, typename Index::iterator i)
     {
         // the resulting iterator
-        typename Index::iterator result;
+        typename Index::iterator result = i;
+        ++result;
 
         // for every index held by mi, remove the value referenced by i
-        fusion::for_each(mi.indices, erase_single<Index>(ind, *i, result));
+        fusion::for_each(mi.indices, erase_single<typename Index::value_type>(*i));
 
         // return the result
         return result;
@@ -45,25 +59,26 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
     template <typename MultiIndex, typename Index>
     inline typename Index::iterator erase(MultiIndex & mi, Index & ind, typename Index::iterator f, typename Index::iterator l)
     {
-        // the resulting iterator
-        typename Index::iterator result;
-
-        // for every index except ind, held by mi, remove the values between f & l
-        // the values are not removed from ind so the iterator range remains valid until the end of the operation
-        fusion::for_each(mi.indices, erase_multiple<Index>(ind, f, l));
+        // remove every value between [f,l) from every index in mi, except ind
+        for (typename Index::iterator i = f; i != l; ++i)
+        {
+            fusion::for_each(all_indices_but(mi, ind), erase_single<typename Index::value_type>(*i));
+        }
 
         // remove the range from ind and return the result
         return ind.impl().erase(f, l);
     }
 
+    // TODO: Is there a point to this function? Will 'replace' ever be used?
     template <typename MultiIndex, typename Iterator>
     inline bool replace(MultiIndex const& mi, Iterator pos, typename MultiIndex::value_type const& x)
     {
         typedef typename MultiIndex::value_type value_type;
 
+        bool result = true;
+
         // for every associative index, check if x can be inserted, assuming *pos is absent
-        bool result;
-        fusion::for_each(mi.indices, can_insert<value_type>(x, result));
+        fusion::for_each(mi.indices, can_insert<value_type>(x, *pos, result));
 
         // if x cannot be inserted, stop now
         if (!result)
@@ -72,16 +87,16 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         }
 
         // dereference pos so we have the value after pos is rendered invalid
-        value_type & value = *pos;
+        value_type & old_value = *pos;
 
-        // erase value from every non-sequence index
-        fusion::for_each(mi.indices, erase_assoc<value_type>(value));
+        // erase value from every associative index
+        fusion::for_each(mi.indices, erase_assoc<value_type>(old_value));
 
         // modify the value
-        value = x;
+        old_value = x;
 
         // re-insert into associative indices
-        insert_assoc<value_type> ia(value);
+        insert_assoc<value_type> ia(old_value);
         fusion::for_each(mi.indices, ia);
 
         // since we checked beforehand, the insertion should always work
@@ -98,6 +113,9 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         // get the value before detaching
         value_type & value = *pos;
 
+        // copy the value in case modification fails
+        value_type copy = value;
+
         // erase value from every non-sequence index
         fusion::for_each(mi.indices, erase_assoc<value_type>(value));
 
@@ -108,10 +126,19 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         insert_assoc<value_type> ia(value);
         fusion::for_each(mi.indices, ia);
 
-        // if re-insertion failed, remove the modified value from every index that successfully added it
+        // if re-insertion failed, remove the modified value from every index that successfully added it,
+        // and insert the old one
         if (!ia.result)
         {
-            fusion::for_each(mi.indices, handle_failed_insert<value_type>(value, ia.last_failed));
+            fusion::for_each(mi.indices, handle_failed_insert<value_type>(value, ia.last_index));
+
+            value = copy;
+
+            ia = insert_assoc<value_type>(value);
+            fusion::for_each(mi.indices, ia);
+
+            BOOST_ASSERT(ia.result);
+
             return false;
         }
 
@@ -137,12 +164,12 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
         // insert into all other indices
         insert<typename Index::impl_type> ins(x, ind, result);
-        fusion::for_each(mi.indices, ins);
+        fusion::for_each(all_indices_but(mi, ind), ins);
 
         // if insertion failed, remove the value from every index
         if (!result.second)
         {
-            fusion::for_each(mi.indices, handle_failed_insert<value_type>(x, ins.last_failed));
+            fusion::for_each(all_indices_but(mi, ind), handle_failed_insert<value_type>(x, ins.last_index));
             ind.impl().erase(ind.impl().iterator_to(x));
         }
 
@@ -167,12 +194,12 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
         // insert into all other indices
         insert_with_hint<typename Index::impl_type> iwh(ind, x, pos, result);
-        fusion::for_each(mi.indices, iwh);
+        fusion::for_each(all_indices_but(mi, ind), iwh);
 
         // if insertion failed, remove the value from every index
         if (&*result != &x)
         {
-            fusion::for_each(mi.indices, handle_failed_insert<value_type>(x, iwh.last_failed));
+            fusion::for_each(all_indices_but(mi, ind), handle_failed_insert<value_type>(x, iwh.last_index));
             ind.impl().erase(ind.impl().iterator_to(x));
         }
 
@@ -191,12 +218,12 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
         // insert into every other index
         insert<typename Index::impl_type> ins(x, ind, result);
-        fusion::for_each(mi.indices, ins);
+        fusion::for_each(all_indices_but(mi, ind), ins);
 
         // if insertion failed, remove the value from every index
         if (!result.second)
         {
-            fusion::for_each(mi.indices, handle_failed_insert<value_type>(x, ins.last_failed));
+            fusion::for_each(all_indices_but(mi, ind), handle_failed_insert<value_type>(x, ins.last_index));
             ind.impl().erase(ind.impl().iterator_to(x));
         }
 

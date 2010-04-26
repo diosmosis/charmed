@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file insert.hpp
+/// Contains the <c>insert\<\></c> function object.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,6 +22,20 @@
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
+    /// \brief A function object used by the free functions in core_operations.hpp
+    ///        to insert a value into every index of a <c>multi_index_container</c>.
+    /// 
+    /// <c>insert\<\></c> accepts a non-const reference to an index. If the index is
+    /// sequenced, the value supplied during construction will be <c>push_back</c>ed.
+    /// If the index is associative, insertion is attempted. In either case the
+    /// iterator result is saved. If an insertion fails, no other insertion/push_back
+    /// is attempted. In addition, the expression <c>result.second</c> will evaluate to
+    /// false and the member <c>last_index</c> will reference the index of the index
+    /// where insertion failed.
+    ///
+    /// <c>insert\<\></c> also holds a reference to the index for whom insertion was
+    /// originally requested. This reference is used to convert iterators that result
+    /// from inserts to the appropriate type.
     template <typename IndexImpl>
     struct insert
     {
@@ -31,7 +48,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
             : value(v)
             , ind(i.impl())
             , result(r)
-            , last_failed(-1)
+            , last_index(-1)
         {
             result.second = true;
         }
@@ -41,12 +58,12 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
             is_associative_container<typename Index::impl_type>, void
         >::type operator()(Index & other) const
         {
-            if (result.second && static_cast<void *>(&ind) != static_cast<void *>(&other.impl()))
+            if (result.second)
             {
                 std::pair<typename Index::iterator, bool> r = insert_associative_impl(other.impl(), value);
                 result = std::make_pair(ind.iterator_to(*r.first), r.second);
 
-                ++last_failed;
+                ++last_index;
             }
         }
 
@@ -55,18 +72,18 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
             is_associative_container<typename Index::impl_type>, void
         >::type operator()(Index & other) const
         {
-            if (result.second && static_cast<void *>(&ind) != static_cast<void *>(&other.impl()))
+            if (result.second)
             {
                 other.impl().push_back(value);
 
-                ++last_failed;
+                ++last_index;
             }
         }
 
         IndexImpl & ind;
         value_type & value;
         pair_result & result;
-        mutable unsigned int last_failed;
+        mutable unsigned int last_index;
     };
 }}}}
 

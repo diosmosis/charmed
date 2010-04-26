@@ -16,15 +16,14 @@
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
     // TODO need rollback modify_key?
-    template <typename MultiIndex, typename KeyFromValue, typename Impl, typename Specifier>
-    struct set_index : common_index<MultiIndex, Impl, Specifier>
+    template <typename MultiIndexTypes, int N>
+    struct set_index : common_index<MultiIndexTypes, N>
     {
-        typedef common_index<MultiIndex, Impl, Specifier> base_type;
+        typedef typename specifier::key_from_value_type key_from_value_type;
+        typedef typename key_from_value_type::result_type key_type;
 
-        typedef typename KeyFromValue::result_type key_type;
-
-        set_index(multi_index_type & x, Impl & i)
-            : base_type(x, i)
+        set_index(multi_index_type & x, impl_type & i)
+            : common_index(x, i)
         {}
 
         template <typename CompatibleKey>
@@ -42,7 +41,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         template <typename Modifier>
         bool modify_key(iterator position, Modifier m)
         {
-            return detail::modify(container, position, key_from_value_composite<KeyFromValue, Modifier>(m));
+            return detail::modify(container, position, key_from_value_composite<key_from_value_type, Modifier>(m));
         }
 
         std::pair<iterator, bool> insert(value_type & x)

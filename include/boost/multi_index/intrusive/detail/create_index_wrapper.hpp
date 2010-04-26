@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file create_index_wrapper.hpp
+/// Contains the <c>create_index_wrapper\<\></c> function object type.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,17 +14,17 @@
 #define BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_CREATE_INDEX_WRAPPER_HPP
 
 #include <boost/mpl/at.hpp>
-
 #include <boost/fusion/include/at.hpp>
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
-    template <typename MultiIndex>
+    /// \brief Used by <c>multi_index_container</c> to wrap intrusive containers on the fly.
+    ///
+    /// 
+    template <typename MultiIndexTypes>
     struct create_index_wrapper
     {
-        typedef typename MultiIndex::index_specifier_list index_specifier_list;
-        typedef typename MultiIndex::value_type value_type;
-        typedef typename MultiIndex::hook_specifier hook_specifier;
+        typedef typename MultiIndexTypes::index_specifier_list index_specifier_list;
 
         template <typename N>
         struct result;
@@ -30,11 +33,10 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         struct result<create_index_wrapper(N)>
         {
             typedef typename mpl::at<index_specifier_list, N>::type specifier;
-            typedef typename specifier::template index_class<
-                MultiIndex, value_type, hook_specifier, N::value>::type type;
+            typedef typename specifier::template index_class<MultiIndexTypes, N::value>::type type;
         };
 
-        create_index_wrapper(MultiIndex & mi_)
+        create_index_wrapper(typename MultiIndexTypes::self_type & mi_)
             : mi(mi_)
         {}
 
@@ -45,7 +47,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
             return index_type(mi, fusion::at<N>(mi.index_storage));
         }
 
-        MultiIndex & mi;
+        typename MultiIndexTypes::self_type & mi;
     };
 }}}}
 

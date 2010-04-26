@@ -18,8 +18,9 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
     template <typename Value>
     struct can_insert
     {
-        can_insert(Value & v, bool & r)
-            : value(v)
+        can_insert(Value & nv, Value & ov, bool & r)
+            : new_value(nv)
+            , old_value(ov)
             , result(r)
         {
             result = true;
@@ -38,13 +39,17 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
             is_set_unique_container<typename Index::impl_type>, void
         >::type operator()(Index & x) const
         {
+            // TODO: Instead of using find, for unordered indices, we can just use the key_eq() function object.
             if (result)
             {
-                result = !x.impl().contains(value);
+                typename Index::const_iterator i = x.impl().find(new_value);
+
+                result = &*i != &old_value && i != x.impl().end();
             }
         }
 
-        Value & value;
+        Value & new_value;
+        Value & old_value;
         bool & result;
     };
 }}}}

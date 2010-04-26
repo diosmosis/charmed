@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file erase_single.hpp
+/// Contains the <c>erase_single\<\></c> function object type.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,42 +15,22 @@
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
-    template <typename Index>
+    /// \brief A function object used by \ref core_operations.hpp to erase a single value from
+    ///        every index.
+    template <typename Value>
     struct erase_single
     {
-        typedef typename Index::value_type value_type;
-        typedef typename Index::iterator iterator;
-
-        erase_single(Index & i, value_type const& v, iterator & r)
-            : index(i)
-            , value(v)
-            , result(r)
+        erase_single(Value const& v)
+            : value(v)
         {}
 
-        template <typename I0>
-        void operator()(I0 & x) const
+        template <typename Index>
+        void operator()(Index & x) const
         {
-            // if x is the index for which erase was initially called, store the result of erasing, otherwise
-            // just erase the element
-            if (static_cast<void *>(&x.impl()) == static_cast<void *>(&index.impl()))
-            {
-                // have to get the element after value this way since boost::intrusive::unordered_set's erase does not
-                // return anything
-                // TODO: I should NOT need unconst() here...
-                result = index.impl().iterator_to(value).unconst();
-                ++result;
-
-                x.impl().erase(x.impl().iterator_to(value));
-            }
-            else
-            {
-                x.impl().erase(x.impl().iterator_to(value));
-            }
+            x.impl().erase(x.impl().iterator_to(value));
         }
 
-        Index & index;
-        value_type const& value;
-        iterator & result;
+        Value const& value;
     };
 }}}}
 

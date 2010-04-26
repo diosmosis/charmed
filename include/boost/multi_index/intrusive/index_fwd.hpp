@@ -15,6 +15,9 @@
 
 namespace boost { namespace multi_index { namespace intrusive
 {
+    template <typename Value, typename IndexSpecifierList, typename HookSpecifier>
+    struct multi_index_container;
+
     // specifier forward decls
     // Arg1 -> KeyFromValue
     // Arg2 -> Compare
