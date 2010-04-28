@@ -12,6 +12,7 @@
 
 #include <boost/mpl/transform.hpp>
 #include <boost/fusion/include/as_vector.hpp>
+#include <boost/fusion/include/mpl.hpp>
 
 namespace boost { namespace multi_index { namespace intrusive
 {

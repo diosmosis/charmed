@@ -17,7 +17,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         template <typename Index>
         void operator()(Index & idx) const
         {
-            idx.impl().clear();
+            idx.clear();
         }
     };
 }}}}

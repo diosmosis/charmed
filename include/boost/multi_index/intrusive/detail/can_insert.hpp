@@ -28,7 +28,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
         template <typename Index>
         typename disable_if<
-            is_set_unique_container<typename Index::impl_type>, void
+            is_set_unique_container<Index>, void
         >::type operator()(Index & x) const
         {
             // empty
@@ -36,15 +36,15 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
         template <typename Index>
         typename enable_if<
-            is_set_unique_container<typename Index::impl_type>, void
+            is_set_unique_container<Index>, void
         >::type operator()(Index & x) const
         {
             // TODO: Instead of using find, for unordered indices, we can just use the key_eq() function object.
             if (result)
             {
-                typename Index::const_iterator i = x.impl().find(new_value);
+                typename Index::const_iterator i = x.find(new_value);
 
-                result = &*i != &old_value && i != x.impl().end();
+                result = &*i != &old_value && i != x.end();
             }
         }
 

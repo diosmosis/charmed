@@ -29,15 +29,15 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
         template <typename Index>
         typename enable_if<
-            is_associative_container<typename Index::impl_type>, void
+            is_associative_container<Index>, void
         >::type operator()(Index & x) const
         {
-            x.impl().erase(x.impl().iterator_to(value));
+            x.erase(x.iterator_to(value));
         }
 
         template <typename Index>
         typename disable_if<
-            is_associative_container<typename Index::impl_type>, void
+            is_associative_container<Index>, void
         >::type operator()(Index &) const
         {
             // empty

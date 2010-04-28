@@ -62,6 +62,30 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
         aligned_storage<sizeof(T), alignment_of<T>::value> data;
     };
+
+    struct get_from_lazy_construct
+    {
+        template <typename Sig>
+        struct result;
+
+        template <typename T>
+        struct result<get_from_lazy_construct(T &)>
+        {
+            typedef typename T::data_type & type;
+        };
+
+        template <typename T>
+        struct result<get_from_lazy_construct(T const&)>
+        {
+            typedef typename T::data_type const& type;
+        };
+
+        template <typename T>
+        typename result<get_from_lazy_construct(T &)>::type operator()(T & x) const
+        {
+            return x.get();
+        }
+    };
 }}}}
 
 #endif // #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_LAZY_CONSTRUCT_FROM_TUPLE_HPP )

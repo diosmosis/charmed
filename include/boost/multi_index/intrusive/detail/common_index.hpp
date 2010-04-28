@@ -24,7 +24,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
         typedef typename MultiIndexTypes::self_type                 multi_index_type;
 
-        typedef typename MultiIndexTypes::local_index_tuple_type    impl_list;
+        typedef typename MultiIndexTypes::index_vector_type         impl_list;
         typedef typename MultiIndexTypes::index_specifier_list      specifier_list;
 
         typedef typename mpl::at_c<impl_list, N>::type::data_type   impl_type;

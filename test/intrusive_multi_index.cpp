@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <boost/mpl/assert.hpp>
 #include <boost/mpl/bool.hpp>
-template <typename T> struct lazy_false : boost::mpl::false_ {};
+template <typename T0, typename T1 = int, typename T2 = int> struct lazy_false : boost::mpl::false_ {};
 // TODO: review & check if more test cases should be added (such as for projection)
 #define BOOST_TEST_MODULE intrusive_multi_index
 #include <boost/test/included/unit_test.hpp>

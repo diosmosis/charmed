@@ -13,20 +13,21 @@
 #include <boost/multi_index/intrusive/index_fwd.hpp>
 #include <boost/multi_index/intrusive/detail/lazy_construct_from_tuple.hpp>
 #include <boost/multi_index/intrusive/detail/lazy_construct_index.hpp>
-#include <boost/multi_index/intrusive/detail/create_index_wrapper.hpp>
 
+#include <boost/mpl/at.hpp>
 #include <boost/mpl/size.hpp>
 #include <boost/mpl/front.hpp>
 #include <boost/mpl/always.hpp>
 #include <boost/mpl/transform.hpp>
 #include <boost/mpl/range_c.hpp>
+#include <boost/mpl/copy.hpp>
 #include <boost/mpl/identity.hpp>
 
 #include <boost/fusion/include/at.hpp>
 #include <boost/fusion/include/front.hpp>
 #include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/include/transform_view.hpp>
 #include <boost/fusion/include/as_vector.hpp>
+#include <boost/fusion/include/transform_view.hpp>
 
 #include <boost/noncopyable.hpp>
 
@@ -59,6 +60,13 @@ namespace boost { namespace multi_index { namespace intrusive
             >
         {};
 
+        template <typename MultiIndexTypes, typename N>
+        struct make_index
+        {
+            typedef typename mpl::at<typename MultiIndexTypes::index_specifier_list, N>::type specifier;
+            typedef typename specifier::template index_class<MultiIndexTypes, N::value>::type type;
+        };
+
         template <typename IndexSpecifierList>
         struct empty_args_type
             : fusion::result_of::as_vector<
@@ -77,54 +85,61 @@ namespace boost { namespace multi_index { namespace intrusive
 
         typedef multi_index_container_types<Value, IndexSpecifierList, HookSpecifier> mi_types;
 
+        // TODO: change this to 'multi_index' instead of 'self_type'
         typedef multi_index_container<Value, IndexSpecifierList, HookSpecifier> self_type;
 
         typedef HookSpecifier hook_specifier;
         typedef IndexSpecifierList index_specifier_list;
 
-        typedef typename detail::make_impl_index_vector<Value, IndexSpecifierList, HookSpecifier>::type local_index_tuple_type;
-
-        typedef mpl::range_c<int, 0, index_count> index_range;
+        typedef typename detail::make_impl_index_vector<
+            Value, IndexSpecifierList, HookSpecifier
+        >::type index_vector_type;
 
         typedef typename detail::empty_args_type<IndexSpecifierList>::type empty_args_type;
+
+        // TODO: rename this 'index_list'
+        typedef typename mpl::copy<
+            mpl::range_c<int, 0, index_count>,
+            mpl::inserter<
+                mpl::vector<>,
+                mpl::push_back<mpl::_1, detail::make_index<mi_types, mpl::_2> >
+            >
+        >::type index_view_type;
+
+        typedef typename mpl::front<index_view_type>::type first_index;
     };
 
     template <typename Value, typename IndexSpecifierList, typename HookSpecifier>
     struct multi_index_container
         : boost::noncopyable
         , multi_index_container_types<Value, IndexSpecifierList, HookSpecifier>
-        , boost::mpl::front<IndexSpecifierList>::type::template index_class<
-              multi_index_container_types<Value, IndexSpecifierList, HookSpecifier>, 0
-          >::type
+        , multi_index_container_types<Value, IndexSpecifierList, HookSpecifier>::first_index
     {
-        typedef fusion::transform_view<index_range, detail::create_index_wrapper<self_type> > index_view_type;
-
-        typedef typename mpl::front<IndexSpecifierList>::type::template index_class<mi_types, 0>::type base_type;
+        typedef fusion::transform_view<index_vector_type, detail::get_from_lazy_construct> index_views_type;
+        typedef fusion::transform_view<
+            index_vector_type const, detail::get_from_lazy_construct> const_index_views_type;
 
         template <int N>
         struct nth_index
-            : fusion::result_of::at_c<index_view_type, N>
+            : mpl::at_c<index_view_type, N>
         {};
 
         multi_index_container()
-            : base_type(*this, fusion::front(index_storage))
-            , indices(index_range(), detail::create_index_wrapper<self_type>(*this))
+            : first_index(*this, fusion::front(indices))
         {
             lazy_construct(empty_args_type());
         }
 
         template <typename CtorArgsList>
         multi_index_container(CtorArgsList const& args_list)
-            : base_type(*this, fusion::front(index_storage))
-            , indices(index_range(), detail::create_index_wrapper<self_type>(*this))
+            : first_index(*this, fusion::front(indices))
         {
             lazy_construct(args_list);
         }
 
         template <typename InputIterator, typename CtorArgsList>
         multi_index_container(InputIterator first, InputIterator last, CtorArgsList const& args_list)
-            : base_type(*this, fusion::front(index_storage))
-            , indices(index_range(), detail::create_index_wrapper<self_type>(*this))
+            : first_index(*this, fusion::front(indices))
         {
             // TODO: This will fail...
             lazy_construct(args_list);
@@ -135,13 +150,13 @@ namespace boost { namespace multi_index { namespace intrusive
         template <int N>
         typename nth_index<N>::type get()
         {
-            return fusion::at_c<N>(indices);
+            return typename nth_index<N>::type(*this, fusion::at_c<N>(indices));
         }
 
         template <int N>
         typename nth_index<N>::type const get() const
         {
-            return fusion::at_c<N>(indices);
+            return typename nth_index<N>::type(*this, fusion::at_c<N>(indices));
         }
 
         template <int N, typename IteratorType>
@@ -156,11 +171,11 @@ namespace boost { namespace multi_index { namespace intrusive
             return get<N>().iterator_to(*it);
         }
 
-        void swap(self_type & y)
+        void swap(multi_index_container & y)
         {
             fusion::for_each(
                 mpl::range_c<int, 0, index_count>(),
-                detail::swap_index<local_index_tuple_type>(indices, y.indices));
+                detail::swap_index<index_vector_type>(indices, y.indices));
         }
 
         template <typename CtorArgsList>
@@ -168,11 +183,20 @@ namespace boost { namespace multi_index { namespace intrusive
         {
             fusion::for_each(
                 mpl::range_c<int, 0, index_count>(),
-                detail::lazy_construct_index<local_index_tuple_type, CtorArgsList>(index_storage, args_list));
+                detail::lazy_construct_index<index_vector_type, CtorArgsList>(indices, args_list));
         }
 
-        local_index_tuple_type index_storage;
-        index_view_type indices;
+        index_views_type get_indices()
+        {
+            return index_views_type(indices, detail::get_from_lazy_construct());
+        }
+
+        const_index_views_type get_indices() const
+        {
+            return const_index_views_type(indices, detail::get_from_lazy_construct());
+        }
+
+        index_vector_type indices;
     };
 
     template <typename V, typename I, typename H>

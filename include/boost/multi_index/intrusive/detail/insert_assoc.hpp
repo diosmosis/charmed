@@ -39,12 +39,12 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
         template <typename Index>
         typename enable_if<
-            is_associative_container<typename Index::impl_type>, void
+            is_associative_container<Index>, void
         >::type operator()(Index & idx) const
         {
             if (result)
             {
-                result = idx.impl().insert(value).second;
+                result = idx.insert(value).second;
 
                 ++last_index;
             }
@@ -52,7 +52,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
         template <typename Index>
         typename disable_if<
-            is_associative_container<typename Index::impl_type>, void
+            is_associative_container<Index>, void
         >::type operator()(Index &) const
         {
             // empty

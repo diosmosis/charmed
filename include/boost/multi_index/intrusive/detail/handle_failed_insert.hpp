@@ -37,7 +37,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
             // TODO: don't need this check if I use boost::switch
             if (index_count != 0)
             {
-                x.impl().erase(x.impl().iterator_to(value));
+                x.erase(x.iterator_to(value));
 
                 --index_count;
             }

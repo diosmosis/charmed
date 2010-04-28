@@ -27,7 +27,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         template <typename Index>
         void operator()(Index & x) const
         {
-            x.impl().erase(x.impl().iterator_to(value));
+            x.erase(x.iterator_to(value));
         }
 
         Value const& value;

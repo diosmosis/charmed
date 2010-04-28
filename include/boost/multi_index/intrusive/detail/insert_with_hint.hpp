@@ -32,15 +32,15 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
         template <typename Index>
         typename enable_if<
-            is_associative_container<typename Index::impl_type>, void
+            is_associative_container<Index>, void
         >::type operator()(Index & other) const
         {
             typedef typename Index::iterator other_iterator;
 
             if (!failed())
             {
-                other_iterator result_ = other.impl().insert(pos, value);
-                result = ind.impl().iterator_to(*result_);
+                other_iterator result_ = other.insert(pos, value);
+                result = ind.iterator_to(*result_);
 
                 ++last_failed;
             }
@@ -48,14 +48,14 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
         template <typename Index>
         typename disable_if<
-            is_associative_container<typename Index::impl_type>, void
+            is_associative_container<Index>, void
         >::type operator()(Index & other) const
         {
             typedef typename Index::iterator other_iterator;
 
             if (!failed())
             {
-                other.impl().push_back(value);
+                other.push_back(value);
 
                 ++last_failed;
             }
