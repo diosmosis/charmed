@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file common_index.hpp
+/// Contains <c>common_index\<\></c>, the base of all container wrapper types.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,13 +19,17 @@
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
-    // indices forward decls
+    /// \brief The base of all index types.
+    /// 
+    /// <c>common_index\<\></c> wraps an intrusive container and defines methods provided by
+    /// every type of container. Methods that modify the wrapped container are routed to the
+    /// free functions in \ref core_operations.hpp, so other indices can be modified appropriately.
     template <typename MultiIndexTypes, int N>
     struct common_index
     {
         typedef mpl::int_<N>                                        index_n;
 
-        typedef typename MultiIndexTypes::self_type                 multi_index_type;
+        typedef typename MultiIndexTypes::multi_index_type          multi_index_type;
 
         typedef typename MultiIndexTypes::index_vector_type         impl_list;
         typedef typename MultiIndexTypes::index_specifier_list      specifier_list;

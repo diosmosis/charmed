@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file lazy_construct_from_tuple.hpp
+/// Contains the <c>lazy_construct_from_tuple\<\></c> type.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -27,17 +30,40 @@
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
+    /// \brief Allows delayed construction of a type T using a fusion sequence.
+    ///
+    /// <c>lazy_construct_from_tuple\<\></c> holds an array of bytes equal in size to
+    /// <c>sizeof(T)</c>. The array is interpreted as a <c>T</c> instance, but the
+    /// data is not constructed when the <c>lazy_construct_from_tuple\<\></c> itself
+    /// is. Instead, it is constructed when the <c>construct_()</c> method is called.
+    /// This method accepts a fusion sequence and uses each element in the call to
+    /// type <c>T</c>'s constructor.
+    ///
+    /// \remarks The maximum size of the fusion sequence allowed in the <c>construct_()</c>
+    /// method is determined by the <c>FUSION_MAX_VECTOR_SIZE</c> macro. This macro is defined
+    /// by Boost.Fusion.
+    ///
+    /// \tparam T the type to wrap.
     template <typename T>
     struct lazy_construct_from_tuple
     {
         typedef T data_type;
 
-        lazy_construct_from_tuple() : data() {}
+        lazy_construct_from_tuple()
+            : data()
+        {}
+
         ~lazy_construct_from_tuple()
         {
             static_cast<T *>(data.address())->~T();
         }
 
+        /// \brief Applies in-place construction of the data held by
+        ///        <c>lazy_construct_from_tuple\<\></c> using each element in the supplied fusion
+        ///        sequence.
+        ///
+        /// \param x The fusion sequence containing the constructor arguments to use. The size of
+        ///          the sequence must be less than <c>FUSION_MAX_VECTOR_SIZE</c>.
         template <typename Tuple>
         void construct_(Tuple const& x)
         {
@@ -61,30 +87,6 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         T const& get() const { return *static_cast<T const*>(data.address()); }
 
         aligned_storage<sizeof(T), alignment_of<T>::value> data;
-    };
-
-    struct get_from_lazy_construct
-    {
-        template <typename Sig>
-        struct result;
-
-        template <typename T>
-        struct result<get_from_lazy_construct(T &)>
-        {
-            typedef typename T::data_type & type;
-        };
-
-        template <typename T>
-        struct result<get_from_lazy_construct(T const&)>
-        {
-            typedef typename T::data_type const& type;
-        };
-
-        template <typename T>
-        typename result<get_from_lazy_construct(T &)>::type operator()(T & x) const
-        {
-            return x.get();
-        }
     };
 }}}}
 

@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file multi_index_container.hpp
+/// Contains the <c>multi_index_container\<\></c> intrusive container type.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -45,7 +48,10 @@ namespace boost { namespace multi_index { namespace intrusive
         template <typename IndexSpecifier, typename Value, typename Hook, typename N>
         struct make_impl_index
         {
-            typedef typename IndexSpecifier::template impl_index<Value, Hook, N::value>::type impl_type;
+            typedef typename IndexSpecifier::template impl_index<
+                Value,
+                typename Hook::template apply<N::value>::type
+            >::type impl_type;
             typedef lazy_construct_from_tuple<impl_type> type;
         };
 
@@ -76,6 +82,30 @@ namespace boost { namespace multi_index { namespace intrusive
                 >::type
             >
         {};
+
+        struct get_from_lazy_construct
+        {
+            template <typename Sig>
+            struct result;
+
+            template <typename T>
+            struct result<get_from_lazy_construct(T &)>
+            {
+                typedef typename T::data_type & type;
+            };
+
+            template <typename T>
+            struct result<get_from_lazy_construct(T const&)>
+            {
+                typedef typename T::data_type const& type;
+            };
+
+            template <typename T>
+            typename result<get_from_lazy_construct(T &)>::type operator()(T & x) const
+            {
+                return x.get();
+            }
+        };
     }
 
     template <typename Value, typename IndexSpecifierList, typename HookSpecifier>
@@ -85,8 +115,7 @@ namespace boost { namespace multi_index { namespace intrusive
 
         typedef multi_index_container_types<Value, IndexSpecifierList, HookSpecifier> mi_types;
 
-        // TODO: change this to 'multi_index' instead of 'self_type'
-        typedef multi_index_container<Value, IndexSpecifierList, HookSpecifier> self_type;
+        typedef multi_index_container<Value, IndexSpecifierList, HookSpecifier> multi_index_type;
 
         typedef HookSpecifier hook_specifier;
         typedef IndexSpecifierList index_specifier_list;
@@ -109,6 +138,14 @@ namespace boost { namespace multi_index { namespace intrusive
         typedef typename mpl::front<index_view_type>::type first_index;
     };
 
+    /// \brief Allows one to index one set of values in different ways without allocating on the heap.
+    /// 
+    /// TODO: finish this
+    ///
+    /// \tparam Value the value type.
+    /// \tparam IndexSpecifierList an MPL sequence of index specifiers.
+    /// \tparam HookSpecifier the type that tells <c>multi_index_container\<\></c> how to get the hook(s)
+    ///                       for each index.
     template <typename Value, typename IndexSpecifierList, typename HookSpecifier>
     struct multi_index_container
         : boost::noncopyable
@@ -119,17 +156,28 @@ namespace boost { namespace multi_index { namespace intrusive
         typedef fusion::transform_view<
             index_vector_type const, detail::get_from_lazy_construct> const_index_views_type;
 
+        /// \brief a metafunction that gets the type of the <c>N</c>th index.
+        ///
+        /// \remarks This metafunction will return a container wrapper type, never a Boost.Intrusive
+        ///          container.
+        ///
+        /// \tparam N the index of the index to get the type of.
         template <int N>
         struct nth_index
             : mpl::at_c<index_view_type, N>
         {};
 
+        /// \brief Default constructor.
         multi_index_container()
             : first_index(*this, fusion::front(indices))
         {
             lazy_construct(empty_args_type());
         }
 
+        /// \brief Constructs each index using the fusion sequences in <c>args_list</c>.
+        ///
+        /// \param args_list a fusion sequence of fusion sequences. Each element's elements are used as the
+        ///                  constructor arguments to its corresponding index.
         template <typename CtorArgsList>
         multi_index_container(CtorArgsList const& args_list)
             : first_index(*this, fusion::front(indices))
@@ -137,40 +185,67 @@ namespace boost { namespace multi_index { namespace intrusive
             lazy_construct(args_list);
         }
 
+        /// \brief Constructs each index using the fusion sequences in <c>args_list</c> and fills the container
+        ///        with the values in [first, last).
+        ///
+        /// \param first the first iterator in the range of values to initialize the container with.
+        /// \param last the last iterator in the range of values to initialize the container with.
+        /// \param args_list a fusion sequence of fusion sequences. Each element's elements are used as the
+        ///                  constructor arguments to its corresponding index.
         template <typename InputIterator, typename CtorArgsList>
         multi_index_container(InputIterator first, InputIterator last, CtorArgsList const& args_list)
             : first_index(*this, fusion::front(indices))
         {
-            // TODO: This will fail...
             lazy_construct(args_list);
+
+            // TODO: What happens if this fails?
+            insert(first, last);
         }
 
+        /// \brief Destructor. Clears every index.
         ~multi_index_container() {}
 
+        /// \brief Gets the <c>N</c>th index.
+        /// \tparam N the index of the index to get.
+        /// \return the <c>N</c>th index. This will be a container wrapper.
         template <int N>
         typename nth_index<N>::type get()
         {
             return typename nth_index<N>::type(*this, fusion::at_c<N>(indices));
         }
 
+        /// \brief Gets the <c>N</c>th index.
+        /// \tparam N the index of the index to get.
+        /// \return the <c>N</c>th index. This will be a <c>const</c> container wrapper.
         template <int N>
         typename nth_index<N>::type const get() const
         {
             return typename nth_index<N>::type(*this, fusion::at_c<N>(indices));
         }
 
+        /// \brief Converts an iterator of one index type to that of an iterator of <c>N</c>th index type.
+        /// \tparam N the index of the index to get.
+        /// \param it the iterator to convert.
+        /// \return the converted iterator. It will still reference the same value.
         template <int N, typename IteratorType>
         typename nth_index<N>::type::iterator project(IteratorType it)
         {
             return get<N>().iterator_to(*it);
         }
 
+        /// \brief Converts a <c>const</c> iterator of one index type to that of a <c>const</c> iterator of
+        ///        <c>N</c>th index type.
+        /// \tparam N the index of the index to get.
+        /// \param it the iterator to convert.
+        /// \return the converted iterator. It will still reference the same value.
         template <int N, typename IteratorType>
         typename nth_index<N>::type::const_iterator project(IteratorType it) const
         {
             return get<N>().iterator_to(*it);
         }
 
+        /// \brief Swaps this <c>multi_index_container\<\></c> with <c>y</c>.
+        /// \param y the other <c>multi_index_container\<\></c> to swap with.
         void swap(multi_index_container & y)
         {
             fusion::for_each(
@@ -178,22 +253,32 @@ namespace boost { namespace multi_index { namespace intrusive
                 detail::swap_index<index_vector_type>(indices, y.indices));
         }
 
+        // TODO: This needs to be moved to an friend access type for internal use. Its not for public consumption.
+        /// \brief Gets the fusion sequence of indices.
+        ///
+        /// \return a fusion sequence convertible to non-const references of every index's underlying
+        ///         intrusive container.
+        index_views_type get_indices()
+        {
+            return index_views_type(indices, detail::get_from_lazy_construct());
+        }
+
+        /// \brief Gets the fusion sequence of indices.
+        ///
+        /// \return a fusion sequence convertible to const references of every index's underlying
+        ///         intrusive container.
+        const_index_views_type get_indices() const
+        {
+            return const_index_views_type(indices, detail::get_from_lazy_construct());
+        }
+
+    private:
         template <typename CtorArgsList>
         void lazy_construct(CtorArgsList & args_list)
         {
             fusion::for_each(
                 mpl::range_c<int, 0, index_count>(),
                 detail::lazy_construct_index<index_vector_type, CtorArgsList>(indices, args_list));
-        }
-
-        index_views_type get_indices()
-        {
-            return index_views_type(indices, detail::get_from_lazy_construct());
-        }
-
-        const_index_views_type get_indices() const
-        {
-            return const_index_views_type(indices, detail::get_from_lazy_construct());
         }
 
         index_vector_type indices;

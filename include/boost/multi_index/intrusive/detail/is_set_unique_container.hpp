@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file is_set_unique_container.hpp
+/// Contains the <c>is_set_unique_container\<\></c> metafunction.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,12 +13,17 @@
 #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_IS_SET_UNIQUE_CONTAINER_HPP )
 #define BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_IS_SET_UNIQUE_CONTAINER_HPP
 
-#include <boost/multi_index/intrusive/detail/bucketed_fwd.hpp>
+#include <boost/multi_index/intrusive/index_fwd.hpp>
 #include <boost/intrusive/intrusive_fwd.hpp>
 #include <boost/mpl/bool.hpp>
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
+    /// \brief A metafunction that tells whether an associative container allows equal
+    ///        values or not.
+    ///
+    /// \remarks In order to add another associative index type to Intrusive Multi-Index,
+    ///          this metafunction must be specialized.
     template <typename S>
     struct is_set_unique_container
         : mpl::false_
@@ -37,7 +45,7 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         : mpl::true_
     {};
 
-    template <typename T, typename ...Options>>
+    template <typename T, typename ...Options>
     struct is_set_unique_container<boost::intrusive::unordered_set<T, Options> >
         : mpl::true_
     {};

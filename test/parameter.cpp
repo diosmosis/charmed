@@ -35,19 +35,8 @@ CHARMED_TAG_PARAMETER(&my_function, 0, parameter_name_attribute("arg1"));
 CHARMED_TAG_PARAMETER(&my_function, 1, parameter_name_attribute("arg2"));
 CHARMED_TAG_PARAMETER(&my_function, 3, parameter_name_attribute("whatever2"));
 
-// TODO: Get this test case to work.
-/*
-BOOST_AUTO_TEST_CASE( parameter_attribute_ct )
-{
-    BOOST_CHECK(query::parameter_attribute<parameter_name_attribute, 0>(&my_function) == "arg1");
-    BOOST_CHECK(query::parameter_attribute<parameter_name_attribute, 1>(&my_function) == "arg2");
-    BOOST_CHECK(query::parameter_attribute<parameter_name_attribute, 2>(&my_function) == "whatever");
-}
-*/
 BOOST_AUTO_TEST_CASE( parameter_attribute_rt_test )
 {
-    parameter_name_attribute * attr = 0;
-
     BOOST_REQUIRE(query::parameter_attribute<parameter_name_attribute>(&my_function, 0));
     BOOST_CHECK(query::parameter_attribute<parameter_name_attribute>(&my_function, 0)->name == "arg1");
 

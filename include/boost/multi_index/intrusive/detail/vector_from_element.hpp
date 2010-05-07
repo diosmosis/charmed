@@ -1,5 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file vector_from_element.hpp
+/// Contains the mechanism used to get pointer-to-member pointers for elements
+/// in a <c>fusion::vector\<\></c>.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -35,24 +39,31 @@
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
-    template <typename Tuple, int N>
+    template <typename Vector, int N>
     struct vector_member_ptr;
 
 #define BOOST_PP_FILENAME_1 <boost/multi_index/intrusive/detail/vector_from_element.hpp>
 #include BOOST_PP_ITERATE()
 
-    template <typename Tuple, int N>
-    Tuple * vector_from_element(typename mpl::at_c<Tuple, N>::type * item)
+    /// \brief Obtains the address of a <c>fusion::vector\<\></c> based on the address of one of its
+    ///        elements.
+    ///
+    /// \tparam Vector the type of the <c>fusion::vector\<\></c>.
+    /// \tparam N the index of <c>item</c> in <c>Vector</c>.
+    /// \param item the address of the item held in the <c>fusion::vector\<\></c>.
+    /// \result a pointer to the fusion sequence that contains <c>*item</c>.
+    template <typename Vector, int N>
+    Vector * vector_from_element(typename mpl::at_c<Vector, N>::type * item)
     {
-        typedef typename mpl::at_c<Tuple, N>::type type;
-        return boost::intrusive::detail::parent_from_member<Tuple, type>(item, vector_member_ptr<Tuple, N>::get());
+        typedef typename mpl::at_c<Vector, N>::type type;
+        return boost::intrusive::detail::parent_from_member<Vector, type>(item, vector_member_ptr<Vector, N>::get());
     }
 
-    template <typename Tuple, int N>
-    Tuple const* vector_from_element(typename mpl::at_c<Tuple, N>::type const* item)
+    template <typename Vector, int N>
+    Vector const* vector_from_element(typename mpl::at_c<Vector, N>::type const* item)
     {
-        typedef typename mpl::at_c<Tuple, N>::type type;
-        return boost::intrusive::detail::parent_from_member<Tuple, type>(item, vector_member_ptr<Tuple, N>::get());
+        typedef typename mpl::at_c<Vector, N>::type type;
+        return boost::intrusive::detail::parent_from_member<Vector, type>(item, vector_member_ptr<Vector, N>::get());
     }
 }}}}
 
@@ -62,14 +73,14 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
 
 #else // #if !defined( BOOST_PP_IS_ITERATING )
 
-    template <typename Tuple>
-    struct vector_member_ptr<Tuple, BOOST_MULTI_INDEX_INTRUSIVE_n>
+    template <typename Vector>
+    struct vector_member_ptr<Vector, BOOST_MULTI_INDEX_INTRUSIVE_n>
     {
-        typedef typename mpl::at_c<Tuple, BOOST_MULTI_INDEX_INTRUSIVE_n>::type result_type;
+        typedef typename mpl::at_c<Vector, BOOST_MULTI_INDEX_INTRUSIVE_n>::type result_type;
 
-        static result_type Tuple::* get()
+        static result_type Vector::* get()
         {
-            return &Tuple::BOOST_PP_CAT(m, BOOST_MULTI_INDEX_INTRUSIVE_n);
+            return &Vector::BOOST_PP_CAT(m, BOOST_MULTI_INDEX_INTRUSIVE_n);
         }
     };
 

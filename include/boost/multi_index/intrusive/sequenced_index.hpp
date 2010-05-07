@@ -1,5 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file sequenced_index.hpp
+/// Contains the <c>sequenced_index\<\></c> index type and the <c>sequenced</c>
+/// index specifier type.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,6 +22,12 @@
 
 namespace boost { namespace multi_index { namespace intrusive
 {
+    /// \brief The container wrapper type for bidirectional containers.
+    ///
+    /// <c>sequenced_index\<\></c> wraps an intrusive container and defines methods that are only
+    /// provided by bidirectional containers. Methods that modify the wrapped container are routed
+    /// to the free functions in \ref core_operations.hpp, so other indices can be modified
+    /// appropriately.
     template <typename MultiIndexTypes, int N>
     struct sequenced_index : detail::common_index<MultiIndexTypes, N>
     {
@@ -73,6 +83,15 @@ namespace boost { namespace multi_index { namespace intrusive
             return detail::insert_sequenced(container, *this, position, x);
         }
 
+        template <typename Iterator>
+        void insert(Iterator const& f, Iterator const& l)
+        {
+            for (; f != l; ++f)
+            {
+                insert(end(), *f);
+            }
+        }
+
         reference front()
         {
             return impl().front();
@@ -94,14 +113,18 @@ namespace boost { namespace multi_index { namespace intrusive
         }
     };
 
+    /// \brief The index specifier used to add a sequenced index to a <c>multi_index_container\<\></c>.
+    ///
+    /// \remarks <c>sequenced</c> uses a <c>boost::intrusive::list\<\></c> as the underlying container
+    ///          type.
     struct sequenced
     {
         typedef boost::intrusive::list_member_hook<> hook_type;
 
-        template <typename Value, typename Hook, int N>
+        template <typename Value, typename Hook>
         struct impl_index
         {
-            typedef boost::intrusive::list<Value, typename Hook::template apply<N>::type> type;
+            typedef boost::intrusive::list<Value, Hook> type;
         };
 
         template <typename MultiIndex, int N>

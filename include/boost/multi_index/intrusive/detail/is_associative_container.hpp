@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file is_associative_container.hpp
+/// Contains the <c>is_associative_container\<\></c> metafunction.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,12 +13,17 @@
 #if !defined( BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_IS_ASSOCIATIVE_CONTAINER_HPP )
 #define BOOST_MULTI_INDEX_INTRUSIVE_DETAIL_IS_ASSOCIATIVE_CONTAINER_HPP
 
-#include <boost/multi_index/intrusive/detail/bucketed_fwd.hpp>
+#include <boost/multi_index/intrusive/index_fwd.hpp>
 #include <boost/intrusive/intrusive_fwd.hpp>
 #include <boost/mpl/bool.hpp>
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
+    /// \brief A metafunction that can be used to determine whether a container type is
+    ///        associative or sequenced.
+    ///
+    /// \remarks In order to add another index type to Intrusive Multi-Index, this
+    ///          metafunction must be specialized.
     template <typename S>
     struct is_associative_container
         : mpl::false_

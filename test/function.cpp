@@ -73,28 +73,28 @@ BOOST_AUTO_TEST_CASE( all_attributes_test )
 
 BOOST_AUTO_TEST_CASE( metadata_of_test )
 {
-    BOOST_REQUIRE(query::single_metadata_of<function_name_attribute>(&my_function));
-    BOOST_CHECK(query::single_metadata_of<function_name_attribute>(&my_function)->name == "my_function");
+    BOOST_REQUIRE(query::metadata_of<function_name_attribute>(&my_function));
+    BOOST_CHECK(query::metadata_of<function_name_attribute>(&my_function)->name == "my_function");
 
-    BOOST_REQUIRE(query::single_metadata_of<function_name_attribute>(&my_other_function));
-    BOOST_CHECK(query::single_metadata_of<function_name_attribute>(&my_other_function)->name == "my_other_function");
+    BOOST_REQUIRE(query::metadata_of<function_name_attribute>(&my_other_function));
+    BOOST_CHECK(query::metadata_of<function_name_attribute>(&my_other_function)->name == "my_other_function");
 
-    BOOST_REQUIRE(query::single_metadata_of<function_name_attribute>(&my_last_function));
-    BOOST_CHECK(query::single_metadata_of<function_name_attribute>(&my_last_function)->name == "my_last_function");
+    BOOST_REQUIRE(query::metadata_of<function_name_attribute>(&my_last_function));
+    BOOST_CHECK(query::metadata_of<function_name_attribute>(&my_last_function)->name == "my_last_function");
 }
 
 // TODO: This should be moved to another unit test file.
 BOOST_AUTO_TEST_CASE( tagged_type_of_test )
 {
-    BOOST_REQUIRE(query::single_metadata_of<function_name_attribute>(&my_function));
+    BOOST_REQUIRE(query::metadata_of<function_name_attribute>(&my_function));
     BOOST_CHECK(
         query::tagged_type_of<void (int, char **)>(
-            *query::single_metadata_of<function_name_attribute>(&my_function)) == &my_function);
+            *query::metadata_of<function_name_attribute>(&my_function)) == &my_function);
 
     try
     {
         query::tagged_type_of<int>(
-            *query::single_metadata_of<function_name_attribute>(&my_function));
+            *query::metadata_of<function_name_attribute>(&my_function));
 
         BOOST_CHECK_MESSAGE(false, "succeeded in getting the type associated w/ function metadata as an int");
     }

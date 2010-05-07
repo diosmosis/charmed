@@ -15,9 +15,19 @@
 
 namespace boost { namespace multi_index { namespace intrusive
 {
+    namespace detail
+    {
+        template <typename Value, typename Hook, typename Hash, typename Equal, typename BucketCount>
+        struct bucketed_unordered_set;
+
+        template <typename Value, typename Hook, typename Hash, typename Equal, typename BucketCount>
+        struct bucketed_unordered_multiset;
+    }
+
     template <typename Value, typename IndexSpecifierList, typename HookSpecifier>
     struct multi_index_container;
 
+    // TODO: make index customization work like Boost.Intrusive's container options mechanisms.
     // specifier forward decls
     // Arg1 -> KeyFromValue
     // Arg2 -> Compare
@@ -30,6 +40,7 @@ namespace boost { namespace multi_index { namespace intrusive
     // Arg1 -> KeyFromValue
     // Arg2 -> Hash
     // Arg3 -> Pred
+    // Arg4 -> BucketCount
     template <typename Arg1 = mpl::na, typename Arg2 = mpl::na, typename Arg3 = mpl::na, typename Arg4 = mpl::na>
     struct unordered_unique;
 

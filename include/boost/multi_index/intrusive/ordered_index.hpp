@@ -1,5 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file sequenced_index.hpp
+/// Contains the <c>ordered_index\<\></c> index type and the <c>ordered_unique\<\></c>
+/// and <c>ordered_non_unique\<\></c> index specifier types.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,12 +18,18 @@
 #include <boost/multi_index/intrusive/detail/set_index.hpp>
 #include <boost/multi_index/intrusive/detail/key_from_value_composite.hpp>
 #include <boost/multi_index/detail/ord_index_args.hpp>
-
 #include <boost/intrusive/set.hpp>
 #include <boost/intrusive/set_hook.hpp>
 
 namespace boost { namespace multi_index { namespace intrusive
 {
+    // TODO: document index functions for all index types.
+    /// \brief The container wrapper type for sorted associative containers.
+    ///
+    /// <c>ordered_index\<\></c> wraps an intrusive container and defines methods that are only
+    /// provided by sorted associative containers. Methods that modify the wrapped container
+    /// are routed to the free functions in \ref core_operations.hpp, so other indices can be
+    /// modified appropriately.
     template <typename MultiIndexTypes, int N>
     struct ordered_index : detail::set_index<MultiIndexTypes, N>
     {
@@ -119,6 +129,16 @@ namespace boost { namespace multi_index { namespace intrusive
         }
     };
 
+    /// \brief The index specifier used to add a unique ordered index to a
+    ///        <c>multi_index_container\<\></c>.
+    ///
+    /// \remarks <c>ordered_unique\<\></c> uses a <c>boost::intrusive::set\<\></c> as the underlying
+    ///          container type.
+    ///
+    /// \tparam Arg1 the key-from-value function object. This type must be a function that object that
+    ///              extracts the key from a value type.
+    /// \tparam Arg2 the comparison predicate. This type must be a binary function object that compares
+    ///              two key types.
     template <typename Arg1, typename Arg2>
     struct ordered_unique
     {
@@ -128,12 +148,12 @@ namespace boost { namespace multi_index { namespace intrusive
 
         typedef boost::intrusive::set_member_hook<>                             hook_type;
 
-        template <typename Value, typename Hook, int N>
+        template <typename Value, typename Hook>
         struct impl_index
         {
             typedef boost::intrusive::set<
                 Value,
-                typename Hook::template apply<N>::type,
+                Hook,
                 boost::intrusive::compare<detail::key_from_value_composite<key_from_value_type, compare_type> >
             > type;
         };
@@ -145,6 +165,16 @@ namespace boost { namespace multi_index { namespace intrusive
         };
     };
 
+    /// \brief The index specifier used to add a non-unique ordered index to a
+    ///        <c>multi_index_container\<\></c>.
+    ///
+    /// \remarks <c>ordered_non_unique\<\></c> uses a <c>boost::intrusive::multiset\<\></c> as the
+    ///          underlying container type.
+    ///
+    /// \tparam Arg1 the key-from-value function object. This type must be a function that object that
+    ///              extracts the key from a value type.
+    /// \tparam Arg2 the comparison predicate. This type must be a binary function object that compares
+    ///              two key types.
     template <typename Arg1, typename Arg2>
     struct ordered_non_unique
     {
@@ -155,12 +185,12 @@ namespace boost { namespace multi_index { namespace intrusive
 
         typedef boost::intrusive::set_member_hook<>                             hook_type;
 
-        template <typename Value, typename Hook, int N>
+        template <typename Value, typename Hook>
         struct impl_index
         {
             typedef boost::intrusive::multiset<
                 Value,
-                typename Hook::template apply<N>::type,
+                Hook,
                 boost::intrusive::compare<detail::key_from_value_composite<key_from_value_type, compare_type> >
             > type;
         };

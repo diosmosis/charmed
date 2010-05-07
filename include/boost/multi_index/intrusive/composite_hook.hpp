@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file composite_hook.hpp
+/// Contains the <c>composite_hook\<\></c> hook type.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,6 +28,14 @@ namespace boost { namespace multi_index { namespace intrusive
         };
     }
 
+    /// \brief A hook type that holds every hook needed by every index of a <c>multi_index_container\<\></c>
+    ///        in a <c>fusion::vector\<\></c>.
+    ///
+    /// \remarks <c>composite_hook\<\></c> derives from the <c>fusion::vector\<\></c> of hooks.
+    ///
+    /// \tparam IndexSpecifierList the MPL sequence of each index specifier whose hook is to be stored. This
+    ///                            can, and in most cases, will, be the same type used in the specific
+    ///                            <c>multi_index_container\<\></c> type.
     template <typename IndexSpecifierList>
     struct composite_hook
         : fusion::result_of::as_vector<

@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file metadata_of.hpp
+/// Contains the <c>metadata_of\<M\>()</c> function.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,29 +14,42 @@
 #define CHARMED_QUERY_METADATA_OF_HPP
 
 #include <charmed/charmed_fwd.hpp>
-#include <charmed/metadata_storage.hpp>
+#include <charmed/type_index_of.hpp>
 #include <typeinfo>
 
 namespace charmed { namespace query
 {
     // TODO: It should be possible to associate more than one attribute to a type.
+    /// \brief Retrieves the attribute associated with the supplied type data, if any.
+    ///
+    /// \tparam M the attribute type.
+    /// \param type_data the runtime representation of a compile time entity, such as
+    ///                  <c>std::type_info</c> pointer or a function pointer.
+    /// \return a pointer to the attribute associated with <c>*type_data</c> or <c>0</c>
+    ///         if there is none.
     template <typename M>
-    inline M const* single_metadata_of(void const* type_data)
+    inline M const* metadata_of(void const* type_data)
     {
-        typedef typename metadata_storage<M>::container_type container_type;
+        typedef typename charmed::result_of::type_index_of<M>::type index_type;
 
-        enum { last_index = container_type::index_count - 1 };
+        BOOST_ASSERT(type_data);
 
-        typedef typename container_type::template nth_index<last_index>::type::const_iterator iterator;
+        index_type ti = type_index_of<M>();
 
-        iterator i = metadata_storage<M>::metadata().template get<last_index>().find(type_data);
-        return i == metadata_storage<M>::metadata().template get<last_index>().end() ? 0 : &*i;
+        typename index_type::iterator i = ti.find(type_data);
+        return i == ti.end() ? 0 : &*i;
     }
 
+    /// \brief Retrieves the attribute associated with the supplied type, if any.
+    ///
+    /// \tparam M the attribute type.
+    /// \param type_data the runtime representation of a type.
+    /// \return a pointer to the attribute associated with <c>type_data</c> or <c>0</c>
+    ///         if there is none.
     template <typename M>
-    inline M const* single_metadata_of(std::type_info const& type_data)
+    inline M const* metadata_of(std::type_info const& type_data)
     {
-        return single_metadata_of<M>(&type_data);
+        return metadata_of<M>(&type_data);
     }
 }}
 

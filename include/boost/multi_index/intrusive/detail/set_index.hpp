@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file set_index.hpp
+/// Contains the <c>set_index\<\></c> container wrapper type.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,6 +19,12 @@
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
     // TODO need rollback modify_key?
+    /// \brief The base of all associative index types.
+    ///
+    /// <c>set_index\<\></c> is a container wrapper that derives from <c>common_index\<\></c> and
+    /// defines methods that are unique to associative containers. Methods that modify the wrapped
+    /// container are routed to the free functions in \ref core_operations.hpp, so other indices can
+    /// be modified appropriately.
     template <typename MultiIndexTypes, int N>
     struct set_index : common_index<MultiIndexTypes, N>
     {
@@ -54,6 +63,15 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
             return detail::insert_associative(container, *this, position, x);
         }
 
+        template <typename Iterator>
+        void insert(Iterator const& f, Iterator const& l)
+        {
+            for (; f != l; ++f)
+            {
+                insert(*f);
+            }
+        }
+
         size_type erase(value_type const& x)
         {
             // get all items w/ the key 'x'
@@ -77,6 +95,11 @@ namespace boost { namespace multi_index { namespace intrusive { namespace detail
         iterator erase(iterator first, iterator last)
         {
             return common_index::erase(first, last);
+        }
+
+        bool contains(value_type const& x) const
+        {
+            return impl().find(x) != impl().end();
         }
     };
 }}}}

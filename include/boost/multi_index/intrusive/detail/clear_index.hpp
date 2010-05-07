@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file clear_index.hpp
+/// Contains the <c>clear_index</c> function object.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +15,9 @@
 
 namespace boost { namespace multi_index { namespace intrusive { namespace detail
 {
+    /// \brief Clears a container by calling the containers <c>clear()</c> method.
+    ///
+    /// <c>clear_index\<\></c> is used to clear every index in a <c>multi_index_container\<\></c>.
     struct clear_index
     {
         template <typename Index>

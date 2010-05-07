@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file function.hpp
+/// Contains the <c>CHARMED_TAG_FUNCTION()</c> and the attribute tagging macro.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +16,7 @@
 #define CHARMED_TAG_FUNCTION_HPP
 
 #include <charmed/charmed_fwd.hpp>
-#include <charmed/detail/metadata_initializer.hpp>
+#include <charmed/metadata_initializer.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
@@ -21,9 +24,14 @@
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/typeof/typeof.hpp>
 
+/// \brief Associates the function <c>f</c> with the attribute that
+///        results from <c>expr</c>.
+///
+/// \param f the function to associate an attribute with. Must be a function pointer.
+/// \param expr an expression that results in a constructed attribute.
 #define CHARMED_TAG_FUNCTION(f, expr)                                                                                 \
-    charmed::detail::metadata_initializer<BOOST_TYPEOF(expr)>                                                         \
-        charmed::function_association<BOOST_TYPEOF(expr), BOOST_TYPEOF(f)>::type<f>::metadata(f, expr)
+    charmed::metadata_initializer<BOOST_TYPEOF(expr)>                                                                 \
+        charmed::function_association<BOOST_TYPEOF(expr), BOOST_TYPEOF(f)>::type<f>::_(f, expr)
 
 namespace charmed
 {
@@ -47,7 +55,7 @@ namespace charmed
         template <R(*F)(BOOST_PP_ENUM_PARAMS(CHARMED_n, A))>
         struct type
         {
-            static detail::metadata_initializer<M> metadata;
+            static metadata_initializer<M> _;
         };
     };
 

@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+/// \file metadata.hpp
+/// Contains the <c>metadata\<D\></c> type.
+//
 //  Copyright (c) 2010 Benaka Moorthi
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,27 +15,27 @@
 
 #include <charmed/charmed_fwd.hpp>
 #include <charmed/index_specifier_of.hpp>
-#include <charmed/detail/immediate_metadata_base.hpp>
-
 #include <boost/multi_index/intrusive/composite_hook.hpp>
-
-#include <boost/type_traits/is_function.hpp>
-#include <boost/type_traits/remove_pointer.hpp>
-
-#include <boost/utility/enable_if.hpp>
 
 namespace charmed
 {
+    /// \brief The value type of the container that stores and indexes attributes.
+    ///
+    /// \tparam D the attribute type.
     template <typename D>
-    struct metadata : immediate_metadata_base<D>
+    struct metadata : D
     {
         typedef boost::multi_index::intrusive::composite_hook<typename real_index_specifier_of<D>::type> hook_type;
 
         template <typename T>
         metadata(T const* x, D const& d)
-            : immediate_metadata_base(x, typeid(T), d)
+            : D(d)
+            , tagged_data(x)
+            , tagged_type(typeid(T))
         {}
 
+        void const* tagged_data;
+        std::type_info const& tagged_type;
         hook_type hook;
     };
 
