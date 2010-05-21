@@ -28,7 +28,7 @@ namespace charmed
     struct nonunique_initializer
     {
         template <typename T>
-        nonunique_initializer(T const& x, M const& data_)
+        nonunique_initializer(T const* x, M const& data_)
             : data(x, data_)
             , actual(0)
         {

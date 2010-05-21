@@ -14,7 +14,11 @@
 #define CHARMED_VERSION_MINOR 3
 
 #if !defined( CHARMED_PARAMETER_LIMIT )
-#   define CHARMED_PARAMETER_LIMIT 10
+#   define CHARMED_PARAMETER_LIMIT 9
+#endif
+
+#if !defined( CHARMED_PARTIAL_TEMPLATE_LIMIT )
+#   define CHARMED_PARTIAL_TEMPLATE_LIMIT 5
 #endif
 
 #endif // #if !defined( CHARMED_CONFIG_HPP )

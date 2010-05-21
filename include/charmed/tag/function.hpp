@@ -18,7 +18,6 @@
 #include <charmed/charmed_fwd.hpp>
 #include <charmed/metadata_initializer.hpp>
 
-#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>

@@ -29,7 +29,7 @@ namespace charmed
     struct metadata_initializer
     {
         template <typename T>
-        metadata_initializer(T const& x, D const& data_)
+        metadata_initializer(T const* x, D const& data_)
             : data(x, data_)
         {
             if (!type_index_of<D>().insert(data).second)
