@@ -19,4 +19,11 @@ test-suite "charmed" :
     [ run parameter.cpp ]
     [ run function.cpp ]
     [ run type.cpp ]
+    [ run variable.cpp ]
+    [ run member.cpp ]
+    [ run member_function.cpp ]
+    [ run all_attributes.cpp ]
+    [ run find_attribute.cpp ]
+    [ run find_all.cpp ]
+    [ run attribute_count.cpp ]
     ;

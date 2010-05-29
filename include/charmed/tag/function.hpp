@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 /// \file function.hpp
-/// Contains the <c>CHARMED_TAG_FUNCTION()</c> and the attribute tagging macro.
+/// Contains the <c>CHARMED_TAG_FUNCTION()</c> attribute tagging macro.
 //
 //  Copyright (c) 2010 Benaka Moorthi
 //
@@ -17,7 +17,6 @@
 
 #include <charmed/charmed_fwd.hpp>
 #include <charmed/metadata_initializer.hpp>
-
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
@@ -37,11 +36,11 @@ namespace charmed
     template <typename M, typename F>
     struct function_association;
 
-#define CHARMED_n BOOST_PP_ITERATION()
-#define BOOST_PP_FILENAME_1 <charmed/tag/function.hpp>
-#define BOOST_PP_ITERATION_LIMITS (0, CHARMED_PARAMETER_LIMIT)
-#include BOOST_PP_ITERATE()
-#undef CHARMED_n
+    #define CHARMED_n BOOST_PP_ITERATION()
+    #define BOOST_PP_FILENAME_1 <charmed/tag/function.hpp>
+    #define BOOST_PP_ITERATION_LIMITS (0, CHARMED_PARAMETER_LIMIT)
+    #include BOOST_PP_ITERATE()
+    #undef CHARMED_n
 }
 
 #endif // #if !defined( CHARMED_TAG_FUNCTION_HPP )

@@ -27,23 +27,35 @@ namespace charmed { namespace query
         /// to an attribute and iterates over the first index of the attribute's storage container.
         ///
         /// \tparam M the attribute type.
-        template <typename M>
+        template <typename M, int N = 0>
         struct all_attributes
         {
-            typedef typename metadata_range<M>::type type;
+            typedef typename metadata_range<M, N>::type type;
         };
     }
 
-    /// \brief Retrieves all attributes of type <c>M</c>.
+    /// \brief Retrieves all attributes of type <c>M</c> using the <c>N</c>th attribute index.
     ///
-    /// \tparam M The attribute type.
+    /// \tparam M the attribute type.
+    /// \tparam N the index of the attribute index to use.
+    /// \return a range of type <c>metadata_range\<M, N\>::type</c> that iterates over every
+    ///         attribute of type <c>M</c>.
+    template <typename M, int N>
+    inline typename result_of::all_attributes<M, N>::type all_attributes()
+    {
+        typedef typename result_of::all_attributes<M, N>::type result_type;
+        return result_type(metadata_storage<M>::metadata().get<N>());
+    }
+
+    /// \brief Retrieves all attributes of type <c>M</c> using the first attribute index.
+    ///
+    /// \tparam M the attribute type.
     /// \return a range of type <c>metadata_range\<M\>::type</c> that iterates over every
     ///         attribute of type <c>M</c>.
     template <typename M>
     inline typename result_of::all_attributes<M>::type all_attributes()
     {
-        typedef typename result_of::all_attributes<M>::type result_type;
-        return result_type(metadata_storage<M>::metadata());
+        return all_attributes<M, 0>();
     }
 }}
 

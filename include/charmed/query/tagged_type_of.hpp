@@ -30,6 +30,7 @@
 
 namespace charmed { namespace query
 {
+    // TODO: It is possible to tag more than just types, so tagged_type_of must be renamed.
     namespace detail
     {
         // TODO: Won't boost::add_const take care of this?
@@ -41,45 +42,6 @@ namespace charmed { namespace query
                 boost::add_const<T>
             >
         {};
-    }
-
-    // TODO: this shouldn't be here. There should be a find_attribute function that checks on whatever index
-    // is desired.
-    template <typename T, typename M, typename K>
-    inline typename detail::add_const<T>::type * tagged_type_of(K const& key)
-    {
-        typedef typename detail::add_const<T>::type consted_T;
-
-        typename metadata_iterator<M>::type i = metadata_storage<M>::metadata().find(key);
-
-        if (i == metadata_storage<M>::metadata().end())
-        {
-            return 0;
-        }
-
-#if defined( CHARMED_NOTHROW )
-        BOOST_ASSERT(i->tagged_type == typeid(T));
-#else
-        if (i->tagged_type != typeid(T))
-        {
-            throw bad_metadata_cast(typeid(T), i->tagged_type);
-        }
-#endif // #if defined( CHARMED_NOTHROW )
-
-        return static_cast<consted_T *>(i->tagged_data);
-    }
-
-    template <typename M, typename K>
-    inline void const* tagged_type_of_raw(K const& key)
-    {
-        typename metadata_iterator<M>::type i = metadata_storage<M>::metadata().find(key);
-
-        if (i == metadata_storage<M>::metadata().end())
-        {
-            return 0;
-        }
-
-        return i->tagged_data;
     }
 
     // TODO: Should everything be named 'metadata'? Or 'attribute'?

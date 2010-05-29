@@ -14,7 +14,7 @@
 #include <charmed/query/all_attributes.hpp>
 #include <charmed/query/tagged_type_of.hpp>
 #include <string>
-#include <iostream>
+
 using namespace charmed;
 
 struct my_type

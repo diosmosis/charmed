@@ -80,6 +80,12 @@ namespace boost { namespace multi_index { namespace intrusive
             return impl().find(x, detail::key_from_value_composite<key_from_value_type, CompatibleCompare>(comp));
         }
 
+        template <typename CompatibleKey>
+        size_type count(CompatibleKey const& x) const
+        {
+            return impl().count(x, detail::key_from_value_composite<key_from_value_type, key_compare_type>());
+        }
+
         template <typename CompatibleKey, typename CompatibleCompare>
         size_type count(CompatibleKey const& x, CompatibleCompare const& comp) const
         {
@@ -108,6 +114,12 @@ namespace boost { namespace multi_index { namespace intrusive
         iterator upper_bound(CompatibleKey const& x, CompatibleCompare const& comp) const
         {
             return impl().upper_bound(x, detail::key_from_value_composite<key_from_value_type, CompatibleCompare>(comp));
+        }
+
+        template <typename CompatibleKey>
+        std::pair<const_iterator, const_iterator> equal_range(CompatibleKey const& x) const
+        {
+            return impl().equal_range(x, detail::key_from_value_composite<key_from_value_type, key_compare_type>());
         }
 
         template <typename CompatibleKey, typename CompatibleCompare>

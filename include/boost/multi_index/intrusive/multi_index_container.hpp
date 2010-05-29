@@ -211,7 +211,7 @@ namespace boost { namespace multi_index { namespace intrusive
         template <int N>
         typename nth_index<N>::type get()
         {
-            return typename nth_index<N>::type(*this, fusion::at_c<N>(indices));
+            return typename nth_index<N>::type(*this, fusion::at_c<N>(indices).get());
         }
 
         /// \brief Gets the <c>N</c>th index.
@@ -220,7 +220,10 @@ namespace boost { namespace multi_index { namespace intrusive
         template <int N>
         typename nth_index<N>::type const get() const
         {
-            return typename nth_index<N>::type(*this, fusion::at_c<N>(indices));
+            typedef typename mpl::at_c<index_vector_type, N>::type::data_type nonconst_type;
+            return typename nth_index<N>::type(
+                const_cast<multi_index_container &>(*this),
+                const_cast<nonconst_type &>(fusion::at_c<N>(indices).get()));
         }
 
         /// \brief Converts an iterator of one index type to that of an iterator of <c>N</c>th index type.
