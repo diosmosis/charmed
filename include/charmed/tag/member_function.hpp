@@ -16,7 +16,7 @@
 #define CHARMED_TAG_MEMBER_FUNCTION_HPP
 
 #include <charmed/charmed_fwd.hpp>
-#include <charmed/metadata_initializer.hpp>
+#include <charmed/ref_metadata_initializer.hpp>
 #include <boost/intrusive/set.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
@@ -32,8 +32,10 @@
 /// \param f the pointer-to-member-function to associate an attribute with.
 /// \param expr an expression that results in a constructed attribute.
 #define CHARMED_TAG_MEMBER_FUNCTION(f, expr)                                                                          \
+    charmed::metadata<BOOST_TYPEOF(expr)> CHARMED_MFA(f, expr)::type<f>::attribute(                                   \
+        &CHARMED_MFA(f, expr)::type<f>::mf_node.mem_fun_ptr, expr);                                                   \
     charmed::mem_fun_node<BOOST_TYPEOF(expr), BOOST_TYPEOF(f)> CHARMED_MFA(f, expr)::type<f>::                        \
-        mf_node(f, CHARMED_MFA(f, expr)::get_mf_set(), expr)
+        mf_node(f, CHARMED_MFA(f, expr)::get_mf_set(), CHARMED_MFA(f, expr)::type<F>::attribute)
 
 namespace charmed
 {
@@ -47,15 +49,15 @@ namespace charmed
         typedef mem_fun_node self_type;
 
         template <typename Set>
-        mem_fun_node(F fptr, Set & set, M const& data)
+        mem_fun_node(F fptr, Set & set, metadata<M> & data)
             : mem_fun_ptr(fptr)
-            , _(&mem_fun_ptr, data)
+            , _(data)
         {
             set.insert(*this);
         }
 
         F mem_fun_ptr;
-        metadata_initializer<M> _;
+        ref_metadata_initializer<M> _;
     };
 
     struct mem_fun_comp
@@ -124,6 +126,7 @@ namespace charmed
         template <R(T::*F)(BOOST_PP_ENUM_PARAMS(CHARMED_n, A))>
         struct type
         {
+            static metadata<M> attribute;
             static mem_fun_node<M, function_type> mf_node;
         };
     };
@@ -147,6 +150,7 @@ namespace charmed
         template <R(T::*F)(BOOST_PP_ENUM_PARAMS(CHARMED_n, A)) const>
         struct type
         {
+            static metadata<M> attribute;
             static mem_fun_node<M, function_type> mf_node;
         };
     };

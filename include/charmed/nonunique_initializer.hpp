@@ -16,6 +16,7 @@
 #include <charmed/metadata_storage.hpp>
 #include <charmed/metadata.hpp>
 #include <charmed/type_index_of.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace charmed
 {
@@ -26,6 +27,7 @@ namespace charmed
     /// \tparam M the attribute type.
     template <typename M>
     struct nonunique_initializer
+        : boost::noncopyable
     {
         template <typename T>
         nonunique_initializer(T const* x, M const& data_)
