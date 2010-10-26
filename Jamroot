@@ -14,8 +14,10 @@ use-project boost : $(BOOST_ROOT) ;
 project charmed
     : requirements
         <include>./include
+        <include>$(BOOST_ROOT)
     : usage-requirements
         <include>./include
+        <include>$(BOOST_ROOT)
     ;
 
 alias charmed ;

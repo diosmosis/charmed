@@ -21,14 +21,14 @@
 
 namespace charmed
 {
+    // TODO: document
     template <typename A>
     struct ref_metadata_initializer
         : boost::noncopyable
     {
-        template <typename D>
-        ref_metadata_initializer(metadata<D> & data)
+        ref_metadata_initializer(metadata<A> & data)
         {
-            if (!type_index_of<D>().insert(data).second)
+            if (!type_index_of<A>().insert(data).second)
             {
                 // TODO: Should this ever happen? If not, replace this with an assert in every initializer.
                 throw std::runtime_error("this compile time entity has already been tagged with an equal attribute");

@@ -27,7 +27,7 @@ namespace charmed { namespace query
     /// \param key the key the attribute is associated with.
     /// \return the attribute associated with <c>key</c> or <c>0</c> if none exists.
     template <typename M, int N>
-    inline M const* find_attribute(typename detail::index_key_type<M, N>::type const& key)
+    inline M const* find_attribute(typename charmed::detail::index_key_type<M, N>::type const& key)
     {
         typename metadata_iterator<M, N>::type
            i = metadata_storage<M>::metadata().get<N>().find(key),

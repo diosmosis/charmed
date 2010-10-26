@@ -76,13 +76,13 @@ namespace charmed
     struct pointer_to_member_comp
     {
         template <typename M, typename PointerToMember>
-        bool operator()(pointer_to_member_node<M, PointerToMember> const& x, PointerToMember y) const
+        bool operator()(pointer_to_member_node<M> const& x, PointerToMember y) const
         {
             return x.pointer_to_member < pointer_to_member_cast(y);
         }
 
         template <typename M, typename PointerToMember>
-        bool operator()(PointerToMember x, pointer_to_member_node<M, PointerToMember> const& y) const
+        bool operator()(PointerToMember x, pointer_to_member_node<M> const& y) const
         {
             return pointer_to_member_cast(x) < y.pointer_to_member;
         }
@@ -91,7 +91,7 @@ namespace charmed
     template <typename M, typename T, typename C>
     struct member_association<M, T C::*>
     {
-        typedef boost::intrusive::multiset<pointer_to_member_node<M, T C::*> > ptm_set_type;
+        typedef boost::intrusive::multiset<pointer_to_member_node<M> > ptm_set_type;
 
         // TODO: Add appropriate options for this set.
         // TODO: there should be one ptm set per C type, not per T C::* type. This needs to be moved into another type
@@ -106,7 +106,7 @@ namespace charmed
         struct type
         {
             static metadata<M> attribute;
-            static pointer_to_member_node<M, T C::*> ptm_node;
+            static pointer_to_member_node<M> ptm_node;
         };
     };
 }
