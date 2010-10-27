@@ -539,30 +539,6 @@ namespace detail
     {};
 }
 
-template <typename T>
-struct remove_ref_wrapper
-{
-    typedef T const type;
-};
-
-template <typename T>
-struct remove_ref_wrapper<boost::reference_wrapper<T> >
-{
-    typedef T type;
-};
-
-template <typename T>
-inline T const& unwrap_ref(T const& x)
-{
-    return x;
-}
-
-template <typename T>
-inline T & unwrap_ref(boost::reference_wrapper<T> x)
-{
-    return x.get();
-}
-
 // TODO: allow functors to be used w/ callable_any
 struct callable_any
     : any
@@ -629,27 +605,22 @@ struct callable_any
 
     // TODO: use preprocessor iteration
     // TODO: I'm sure it worked on MSVC if I didn't use const in a situation like this before... not sure why its failing now.
-    //       until I can fix this, need to use boost::ref directly. Frak.
+    //       until I can fix this, need to use boost::ref directly. Frak. (changed back. putting on hold until this is fixed or variadic templates supported).
     template <typename A0>
-    any operator()(A0 const& a0) const
+    any operator()(A0 & a0) const
     {
-        typedef typename remove_ref_wrapper<A0>::type arg0;
+        check_arg_compatibility<any (A0)>();
 
-        check_arg_compatibility<any (arg0)>();
-
-        void * args[] = {&unwrap_ref(a0)};
+        void * args[] = {&a0};
         return delegate_caller(data.address(), args);
     }
 
     template <typename A0, typename A1>
-    any operator()(A0 const& a0, A1 const& a1) const
+    any operator()(A0 & a0, A1 & a1) const
     {
-        typedef typename remove_ref_wrapper<A0>::type arg0;
-        typedef typename remove_ref_wrapper<A1>::type arg1;
+        check_arg_compatibility<any (A0, A1)>();
 
-        check_arg_compatibility<any (arg0, arg1)>();
-
-        void * args[] = {&unwrap_ref(a0), &unwrap_ref(a1)};
+        void * args[] = {&a0, &a1};
         return delegate_caller(data.address(), args);
     }
 
